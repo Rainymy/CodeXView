@@ -1,21 +1,21 @@
 
 
 
-class AIConnection {
-    constructor() {
-        this.prompt = "";
-    }
+// class AIConnection {
+//     constructor() {
+//         this.prompt = "";
+//     }
     
-    async sendToAI(parsedCode) {
-        // send parsedCode to AI
-        var diagramCode;
-        return diagramCode
-    }
+//     async sendToAI(parsedCode) {
+//         // send parsedCode to AI
+//         var diagramCode;
+//         return diagramCode
+//     }
 
 
-}
+// }
 
-module.exports = AIConnection;
+// module.exports = AIConnection;
    
 
     
