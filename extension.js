@@ -1,10 +1,9 @@
 // The module 'vscode' contains the VS Code extensibility API
 
-
 const {parseCode} = require('./Components/codeParser');
 const {analyzeFile} = require('./Utils/Filemanager');
 const {generateCCDDiagram} = require('./Components/diagramGenerator');
-
+const path = require("path");
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 
@@ -20,7 +19,7 @@ function activate(context) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "codexview" is now active!');
 	var parsedCode;
-	var AIConnection = new AIConnection();
+	//var AIConnection = new AIConnection();
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with  registerCommand
 	// The commandId parameter must match the command field in package.json
@@ -33,7 +32,14 @@ function activate(context) {
 
 		if(selectedFile.length > 0){
 			console.log("SelectedFile:" , selectedFile);
+			
+			const folderPath = path.dirname(selectedFile);
+			const folderName = path.basename(folderPath);
+			console.log("Folder Path:", folderPath);
+
+			
 			vscode.window.showInformationMessage('CodeXView! Started...');
+
 			parsedCode = await parseCode(selectedFile);
 
 			console.log("ParsedCode" ,parsedCode.printDotGraph())
@@ -42,11 +48,11 @@ function activate(context) {
 			// och samma för variabler till resultats checkning
 			
 			// skicka parsedCode till AI
-			var diagramCode = await AIConnection.sendToAI(parsedCode);
+			var diagramCode;
 			// kolla om det stämmer
 		
 			// add diagram to project
-			var added = await generateCCDDiagram(diagramCode, selectedFile);
+			var added = await generateCCDDiagram(diagramCode, folderPath,folderName);
 			if(added){
 				vscode.window.showInformationMessage('CodeXView! Finnished, Diagram has been added to your project...');
 			} else{
@@ -59,6 +65,7 @@ function activate(context) {
 		}
 
 	});
+
 
 	context.subscriptions.push(disposable);
 }
