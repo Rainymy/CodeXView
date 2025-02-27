@@ -9,7 +9,7 @@ async function generateCCDDiagram(ccdDiagramCode, folderPath, projectName) {
   
       if (!fs.existsSync(outputFolder)) {
         fs.mkdirSync(outputFolder, { recursive: true });
-        console.log(`Created folder: ${outputFolder}`);
+        //console.log(`Created folder: ${outputFolder}`);
       }
   
       const pngFiles = fs.readdirSync(outputFolder).filter(file => file.endsWith(".png"));
@@ -20,13 +20,13 @@ async function generateCCDDiagram(ccdDiagramCode, folderPath, projectName) {
       const encodedCode = encodePlantUML(exampleccdDiagram);
   
       const plantumlUrl = `https://www.plantuml.com/plantuml/png/${encodedCode}`;
-      console.log(`Fetching diagram from: ${plantumlUrl}`);
+     //console.log(`Fetching diagram from: ${plantumlUrl}`);
   
       // Fetch the PNG from PlantUML
       const response = await axios.get(plantumlUrl, { responseType: "arraybuffer" });
       fs.writeFileSync(outputFilePath, response.data);
   
-      console.log(`CCD Diagram saved at: ${outputFilePath}`);
+      //console.log(`CCD Diagram saved at: ${outputFilePath}`);
       return true;
     } catch (error) {
       console.error(`Error generating CCD diagram: ${error.message}`);

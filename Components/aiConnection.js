@@ -1,21 +1,18 @@
 
-
-
-// class AIConnection {
-//     constructor() {
-//         this.prompt = "";
-//     }
+class AIConnection {
+    constructor() {
+        this.apiUrl = "";
+        this.diagramCode = "";
+    }
     
-//     async sendToAI(parsedCode) {
-//         // send parsedCode to AI
-//         var diagramCode;
-//         return diagramCode
-//     }
+    async getChatResponse(parsedCode) {
+        // send parsedCode to AI
+        // Connect to AI trough azure online app.
+    }
+}
 
-
-// }
-
-// module.exports = AIConnection;
+const AIConnectionInstance = new AIConnection();
+module.exports = AIConnectionInstance;
    
 
     
