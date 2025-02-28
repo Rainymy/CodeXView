@@ -4,71 +4,71 @@ const path = require("path");
 const vscode = require('vscode');
 
 // function imports
-const {parseCode,  syntaxTreeToJson} = require('./Components/codeParser');
-const {analyzeFile} = require('./Utils/Filemanager');
-const {generateCCDDiagram} = require('./Components/diagramGenerator');
-const AIConnection = require('./Components/aiConnection');
+const { parseCode, syntaxTreeToJson } = require('./src/components/codeParser');
+const { fetchFileToAnalyze } = require('./src/utils/activeDocument');
+const { generateCCDDiagram } = require('./src/components/diagramGenerator');
+const AIConnection = require('./src/components/aiConnection');
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
 
-	let parsedCode;
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('codexview.run', async function () {
+  let parsedCode;
+  // The command has been defined in the package.json file
+  // Now provide the implementation of the command with  registerCommand
+  // The commandId parameter must match the command field in package.json
+  const disposable = vscode.commands.registerCommand('codexview.run', async function () {
 
-		let selectedFile =  await analyzeFile();
-		vscode.window.showInformationMessage('CodeXView! Found File...');
+    let selectedFile = await fetchFileToAnalyze();
+    vscode.window.showInformationMessage('CodeXView! Found File...');
 
-		if(selectedFile.length > 0){
-			vscode.window.showInformationMessage('CodeXView! Started...');
+    if (selectedFile.length > 0) {
+      vscode.window.showInformationMessage('CodeXView! Started...');
 
-			parsedCode = await parseCode(selectedFile);
-			const parsedJson = syntaxTreeToJson(parsedCode);
+      parsedCode = await parseCode(selectedFile);
+      const parsedJson = syntaxTreeToJson(parsedCode);
 
-			console.log(parsedCode.printDotGraph());
-			console.log("Parsed JSON:",parsedJson);
-			//ta ut information från parsade koden, som fil count och namn, functions count+namn 
-			// och samma för variabler till resultats checkning
-			
-			// skicka parsedCode till AI
-			const AICon = await AIConnection;
+      console.log(parsedCode.printDotGraph());
+      console.log("Parsed JSON:", parsedJson);
+      //ta ut information från parsade koden, som fil count och namn, functions count+namn
+      // och samma för variabler till resultats checkning
 
-			// await AICon.getChatResponse(parsedCode);
-			// console.log("DiagramCode:", AICon.diagramCode);
-			//const diagramCode = AICon.diagramCode;
-			let diagramCode;
+      // skicka parsedCode till AI
+      const AICon = await AIConnection;
 
-			// add diagram to project
-			const folderPath = path.dirname(selectedFile);
-			const folderName = path.basename(folderPath);
-			// var added = await generateCCDDiagram(diagramCode, folderPath,folderName);
-			// if(added){
-			// 	vscode.window.showInformationMessage('CodeXView! Finnished, Diagram has been added to your project...');
-			// } else{
-			// 	vscode.window.showErrorMessage('CodeXView! Error adding diagram to project...');
-			// }
-			
+      // await AICon.getChatResponse(parsedCode);
+      // console.log("DiagramCode:", AICon.diagramCode);
+      //const diagramCode = AICon.diagramCode;
+      let diagramCode;
 
-		} else {
-			vscode.window.showErrorMessage('No file selected.');
-		}
-
-	});
+      // add diagram to project
+      const folderPath = path.dirname(selectedFile);
+      const folderName = path.basename(folderPath);
+      // var added = await generateCCDDiagram(diagramCode, folderPath,folderName);
+      // if(added){
+      // 	vscode.window.showInformationMessage('CodeXView! Finnished, Diagram has been added to your project...');
+      // } else{
+      // 	vscode.window.showErrorMessage('CodeXView! Error adding diagram to project...');
+      // }
 
 
-	context.subscriptions.push(disposable);
+    } else {
+      vscode.window.showErrorMessage('No file selected.');
+    }
+
+  });
+
+
+  context.subscriptions.push(disposable);
 }
 
 // This method is called when your extension is deactivated
-function deactivate() {}
+function deactivate() { }
 
 module.exports = {
-	activate,
-	deactivate
+  activate,
+  deactivate
 }
 
 
