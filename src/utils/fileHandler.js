@@ -1,5 +1,6 @@
 "use strict";
 const fs = require('fs');
+const jsonc = require("jsonc-parser");
 
 /**
 * @param {String} filePathFs
@@ -7,7 +8,7 @@ const fs = require('fs');
 */
 function readJSONFileSync(filePathFs) {
   const data = fs.readFileSync(filePathFs, { encoding: "utf8" });
-  return JSON.parse(data);
+  return jsonc.parse(data);
 }
 
 /**
@@ -16,6 +17,24 @@ function readJSONFileSync(filePathFs) {
 */
 function readdirSync(filePath) {
   return fs.readdirSync(filePath);
+}
+
+/**
+* @param {String} folderPathFs
+* @returns {boolean}
+* returns true if operation is success. Else return false.
+*/
+function ensureFolderSync(folderPathFs) {
+  try {
+    if (!fs.existsSync(folderPathFs)) {
+      fs.mkdirSync(folderPathFs, { recursive: true });
+    }
+
+    return true;
+  }
+  catch {
+    return false;
+  }
 }
 
 /**
@@ -80,6 +99,7 @@ function customWriteStream(filePathFs, data) {
 module.exports = {
   readJSONFileSync: readJSONFileSync,
   readdirSync: readdirSync,
+  ensureFolderSync: ensureFolderSync,
   writeJSONFileSync: customWriteJSONFileSync,
   writeFileSync: customWriteFileSync,
   deleteFile: deleteFile,

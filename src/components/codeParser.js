@@ -24,6 +24,7 @@ function syntaxTreeToJson(tree) {
 
 // ✅ Helper function to recursively convert a SyntaxNode to JSON
 function syntaxNodeToJson(node) {
+  // TODO: CONVERT THIS INTO WHILE LOOP (Recursively is bad idea with huge data)
   return {
     type: node.type,
     text: node.text, // Extract raw text
