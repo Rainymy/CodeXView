@@ -7,25 +7,24 @@ const axios = require("axios");
 const ProjectConfig = require("./ProjectConfig");
 const PlantUML = require("./PlantUML_base64");
 
-async function generateCCDiagram(folderPath, projectName) {
-
-  const exampleccdDiagram = `
-    @startuml
-    Bob -> Alice : hellorequest
-    @enduml
-    `;
-
+async function generateCCDiagram() {
   const plantumlUrl = PlantUML.generateURL(PlantUML.encoder(exampleccdDiagram))
   // console.log(`Fetching diagram from: ${plantumlUrl}`);
 
+  let response;
   try {
     // Fetch the PNG from PlantUML
-    const response = await axios.get(plantumlUrl);
-    const fileName = getNextFileName(projectName);
-
-    customWriteStream(fileName, response.data);
-
+    response = await axios.get(plantumlUrl, { responseType: "arraybuffer" });
   } catch (error) {
+    console.error(`Network error : ${error.message}`);
+    return false;
+  }
+
+  // write PNG to file
+  const fileName = getNextFileName();
+  const error = await customWriteStream(fileName, response.data);
+
+  if (error) {
     console.error(`Error generating CCD diagram: ${error.message}`);
     return false;
   }
@@ -33,9 +32,16 @@ async function generateCCDiagram(folderPath, projectName) {
   return true;
 }
 
+const exampleccdDiagram = `
+  @startuml
+  Bob -> Alice : hellorequest
+  @enduml
+`;
 
-function getNextFileName(projectName) {
+function getNextFileName() {
   const outputFolder = ProjectConfig.getOutputFolder();
+  const projectName = ProjectConfig.getOutputParentFolder();
+
   const pngFiles = fs.readdirSync(outputFolder).filter(file => file.endsWith(".png"));
 
   return (pngFiles.length > 0)

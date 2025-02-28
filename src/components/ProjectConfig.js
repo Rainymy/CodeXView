@@ -7,10 +7,12 @@ function ProjectConfig() {
   let saveFolder = null;
   let createFolder = null;
   let createFile = null;
+  let rootPath = "";
 
   this.canCreateFolder = () => saveFolder && createFolder;
   this.canCreateFile = () => saveFolder && createFile;
-  this.getOutputFolder = () => saveFolder;
+  this.getOutputFolder = () => path.join(rootPath, saveFolder);
+  this.getOutputParentFolder = () => path.basename(rootPath);
 
   /**
   * @param {String} configPathFs
@@ -23,6 +25,13 @@ function ProjectConfig() {
     saveFolder = config?.saveFolder;
     createFolder = parseBoolFromString(config?.canCreateFolder);
     createFile = parseBoolFromString(config?.canCreateFile);
+  }
+
+  /**
+  * @param {String} rootPathFs
+  */
+  this.setRootPath = (rootPathFs) => {
+    rootPath = rootPathFs;
   }
 
   /**

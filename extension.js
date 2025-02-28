@@ -1,4 +1,6 @@
 "use strict";
+
+
 const path = require("path");
 const vscode = require('vscode');
 
@@ -7,29 +9,48 @@ const { fetchFileToAnalyze } = require('./src/utils/activeDocument');
 const { parseCode, syntaxTreeToJson } = require('./src/components/codeParser');
 const { generateCCDDiagram } = require('./src/components/diagramGenerator');
 const AIConnection = require('./src/components/aiConnection');
-const codexview_setup = require("./src/components/setup");
+const ProjectConfig = require("./src/components/ProjectConfig");
+const codexview = require("./src/components/setup");
+
+const Notify = {
+  info: vscode.window.showInformationMessage,
+  warning: vscode.window.showWarningMessage,
+  error: vscode.window.showErrorMessage
+}
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-  // extension setup
-  codexview_setup(path.join(__dirname, "./config.jsonc"));
-
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with  registerCommand
   // The commandId parameter must match the command field in package.json
   const disposable = vscode.commands.registerCommand('codexview.run', async function () {
+    // empty for now
+    codexview.setup();
+
+    // read configs from jsonc
+    ProjectConfig.load(path.join(__dirname, "./config.jsonc"));
 
     let selectedFile = await fetchFileToAnalyze();
-    vscode.window.showInformationMessage('CodeXView! Found File...');
 
     if (selectedFile.length > 0) {
-      vscode.window.showInformationMessage('CodeXView! Started...');
+      Notify.info('CodeXView! Found File...');
+      // === DONT FORGET TO SET ROOT PATH!!! ===
+      // save folder will be somewhere at the narnia.
+      ProjectConfig.setRootPath(path.dirname(selectedFile));
+      // ensure_structure uses root path to verify output folder.
+      const structure = codexview.ensure_structure();
+
+      if (structure.fatal) { return Notify.error(structure.fatal); }
+      if (structure.info.length) { Notify.warning(structure.info.join("\n")); }
+
+      Notify.info('CodeXView! Started...');
 
       const parsedCode = await parseCode(selectedFile);
       const parsedJson = syntaxTreeToJson(parsedCode);
 
+      Notify.info('CodeXView! Processing......');
       // console.log(parsedCode.printDotGraph());
       // console.log("Parsed JSON:", parsedJson);
 
@@ -44,19 +65,16 @@ function activate(context) {
       //const diagramCode = AICon.diagramCode;
 
       // add diagram to project
-      const folderPath = path.dirname(selectedFile);
-      const folderName = path.basename(folderPath);
-
-      const added = await generateCCDDiagram(folderPath, folderName);
+      const added = await generateCCDDiagram();
       if (added) {
-        vscode.window.showInformationMessage('CodeXView! Finnished, Diagram has been added to your project...');
+        Notify.info('CodeXView! Finnished, Diagram has been added to your project...');
       } else {
-        vscode.window.showErrorMessage('CodeXView! Error adding diagram to project...');
+        Notify.error('CodeXView! Error adding diagram to project...');
       }
 
 
     } else {
-      vscode.window.showErrorMessage('No file selected.');
+      Notify.error('No file selected.');
     }
 
   });

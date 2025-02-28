@@ -87,7 +87,7 @@ function customWriteStream(filePathFs, data) {
   return new Promise((resolve, reject) => {
     const stream = fs.createWriteStream(filePathFs, { flags: "w+" });
     stream.on("ready", () => {
-      stream.write(JSON.stringify(data, null, 4));
+      stream.write(data);
       stream.end();
     });
 
