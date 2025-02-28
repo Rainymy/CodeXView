@@ -1,25 +1,25 @@
 import globals from "globals";
+import js from "@eslint/js"
 
-export default [{
+export default [
+  js.configs.recommended,
+  {
     files: ["**/*.js"],
     languageOptions: {
-        globals: {
-            ...globals.commonjs,
-            ...globals.node,
-            ...globals.mocha,
-        },
-
-        ecmaVersion: 2022,
-        sourceType: "module",
+      globals: {
+        ...globals.commonjs,
+        ...globals.node,
+        ...globals.mocha,
+      },
     },
 
     rules: {
-        "no-const-assign": "warn",
-        "no-this-before-super": "warn",
-        "no-undef": "warn",
-        "no-unreachable": "warn",
-        "no-unused-vars": "warn",
-        "constructor-super": "warn",
-        "valid-typeof": "warn",
+      "no-const-assign": "warn",
+      "no-this-before-super": "warn",
+      "no-undef": "warn",
+      "no-unreachable": "warn",
+      "no-unused-vars": "warn",
+      "constructor-super": "warn",
+      "valid-typeof": "warn",
     },
-}];
+  }];
