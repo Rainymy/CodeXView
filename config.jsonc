@@ -1,0 +1,8 @@
+{
+  // Project save folder.
+  "saveFolder": "./CodeXView",
+  // create "saveFolder" folder/file incase it doesn't exist.
+  // word sensetive: True/true => true - False/false/<anything> => false;
+  "canCreateFolder": "True",
+  "canCreateFile": "True"
+}

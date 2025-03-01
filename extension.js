@@ -1,81 +1,94 @@
-// The module 'vscode' contains the VS Code extensibility API
+"use strict";
 
-const {parseCode} = require('./Components/codeParser');
-const {analyzeFile} = require('./Utils/Filemanager');
-const {generateCCDDiagram} = require('./Components/diagramGenerator');
+
 const path = require("path");
-// Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+const { fetchFileToAnalyze } = require('./src/utils/activeDocument');
+
+const { parseCode, syntaxTreeToJson } = require('./src/components/codeParser');
+const { generateCCDDiagram } = require('./src/components/diagramGenerator');
+const AIConnection = require('./src/components/aiConnection');
+const ProjectConfig = require("./src/components/ProjectConfig");
+const codexview = require("./src/components/setup");
+
+const Notify = {
+  info: vscode.window.showInformationMessage,
+  warning: vscode.window.showWarningMessage,
+  error: vscode.window.showErrorMessage
+}
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+  // The command has been defined in the package.json file
+  // Now provide the implementation of the command with  registerCommand
+  // The commandId parameter must match the command field in package.json
+  const disposable = vscode.commands.registerCommand('codexview.run', async function () {
+    // empty for now
+    codexview.setup();
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "codexview" is now active!');
-	var parsedCode;
-	//var AIConnection = new AIConnection();
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('codexview.run', async function () {
-		// The code you place here will be executed every time your command is executed
+    // read configs from jsonc
+    ProjectConfig.load(path.join(__dirname, "./config.jsonc"));
 
-		// Display a message box to the user
-		var selectedFile =  await analyzeFile();
-		vscode.window.showInformationMessage('CodeXView! Found File...');
+    let selectedFile = await fetchFileToAnalyze();
 
-		if(selectedFile.length > 0){
-			console.log("SelectedFile:" , selectedFile);
-			
-			const folderPath = path.dirname(selectedFile);
-			const folderName = path.basename(folderPath);
-			console.log("Folder Path:", folderPath);
+    if (selectedFile.length > 0) {
+      Notify.info('CodeXView! Found File...');
+      // === DONT FORGET TO SET ROOT PATH!!! ===
+      // save folder will be somewhere at the narnia.
+      ProjectConfig.setRootPath(path.dirname(selectedFile));
+      // ensure_structure uses root path to verify output folder.
+      const structure = codexview.ensure_structure();
 
-			
-			vscode.window.showInformationMessage('CodeXView! Started...');
+      if (structure.fatal) { return Notify.error(structure.fatal); }
+      if (structure.info.length) { Notify.warning(structure.info.join("\n")); }
 
-			parsedCode = await parseCode(selectedFile);
+      Notify.info('CodeXView! Started...');
 
-			console.log("ParsedCode" ,parsedCode.printDotGraph())
-			
-			//ta ut information från parsade koden, som fil count och namn, functions count+namn 
-			// och samma för variabler till resultats checkning
-			
-			// skicka parsedCode till AI
-			var diagramCode;
-			// kolla om det stämmer
-		
-			// add diagram to project
-			var added = await generateCCDDiagram(diagramCode, folderPath,folderName);
-			if(added){
-				vscode.window.showInformationMessage('CodeXView! Finnished, Diagram has been added to your project...');
-			} else{
-				vscode.window.showErrorMessage('CodeXView! Error adding diagram to project...');
-			}
-			
+      const parsedCode = await parseCode(selectedFile);
+      const parsedJson = syntaxTreeToJson(parsedCode);
 
-		} else {
-			vscode.window.showErrorMessage('No file selected.');
-		}
+      Notify.info('CodeXView! Processing......');
+      // console.log(parsedCode.printDotGraph());
+      // console.log("Parsed JSON:", parsedJson);
 
-	});
+      //ta ut information från parsade koden, som fil count och namn, functions count+namn
+      // och samma för variabler till resultats checkning
+
+      // skicka parsedCode till AI
+      // const AICon = await AIConnection;
+
+      // await AICon.getChatResponse(parsedCode);
+      // console.log("DiagramCode:", AICon.diagramCode);
+      //const diagramCode = AICon.diagramCode;
+
+      // add diagram to project
+      const added = await generateCCDDiagram();
+      if (added) {
+        Notify.info('CodeXView! Finnished, Diagram has been added to your project...');
+      } else {
+        Notify.error('CodeXView! Error adding diagram to project...');
+      }
 
 
-	context.subscriptions.push(disposable);
+    } else {
+      Notify.error('No file selected.');
+    }
+
+  });
+
+
+  context.subscriptions.push(disposable);
 }
 
 // This method is called when your extension is deactivated
-function deactivate() {}
+function deactivate() { }
 
 module.exports = {
-	activate,
-	deactivate
+  activate,
+  deactivate
 }
 
 
