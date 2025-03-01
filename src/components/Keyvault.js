@@ -2,23 +2,43 @@ const { SecretClient } = require("@azure/keyvault-secrets");
 const { DefaultAzureCredential } = require("@azure/identity");
 
 
+/**
+* KeyVault is a singleton.
+*
+* You need to download azure-cli. After run -
+* `az login`
+*/
 function KeyVault() {
   const keyVaultURL = "https://kv-codexview.vault.azure.net/";
   /** @type {SecretClient|null} client */
   let client = null;
 
-  const secretKeys = ["Ai-Key-mini-o1", "Ai-url-mini-o1"];
+  const secretKeys = {
+    KEY: "Ai-Key-mini-o1",
+    URL: "Ai-url-mini-o1"
+  };
 
+  /**
+  * Establish connection with KeyVualt.
+  */
   this.init = () => {
     const credential = new DefaultAzureCredential();
     client = new SecretClient(keyVaultURL, credential);
   }
 
-  this.getSecret = async () => {
+  /**
+  * @param {String=} key
+  * @returns
+  */
+  this.getSecret = async (key) => {
     if (!client) throw Error("Client not found");
+    if (typeof key !== "string") throw Error("Invalid key")
 
-    // just fetching first secret. i guess
-    const secret = await client.getSecret(secretKeys[0]);
+    const objKeys = Object.keys(secretKeys);
+    const getKey = objKeys.find((v) => key === v.toLowerCase());
+
+    // getSecret throws if secret not found.
+    const secret = await client.getSecret(getKey ?? key);
 
     console.log(secret);
 

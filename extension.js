@@ -6,7 +6,7 @@ const { fetchFileToAnalyze } = require('./src/utils/activeDocument');
 const { parseCode, syntaxTreeToJson } = require('./src/components/codeParser');
 const { generateCCDDiagram } = require('./src/components/diagramGenerator');
 
-const AIConnection = require('./src/components/aiConnection');
+const AIConnection = require('./src/components/AIConnection');
 const ProjectConfig = require("./src/components/ProjectConfig");
 const Keyvault = require("./src/components/Keyvault");
 const codexview = require("./src/components/setup");
@@ -29,8 +29,6 @@ function activate(context) {
     codexview.setup();
     // access keyvault
     Keyvault.init();
-
-    const secretFromVault = await Keyvault.getSecret();
 
     // read configs from jsonc
     ProjectConfig.load(path.join(__dirname, "./config.jsonc"));
@@ -60,10 +58,11 @@ function activate(context) {
       //ta ut information från parsade koden, som fil count och namn, functions count+namn
       // och samma för variabler till resultats checkning
 
-      // skicka parsedCode till AI
-      // const AICon = await AIConnection;
+      const AICon = new AIConnection().init();
 
-      // await AICon.getChatResponse(parsedCode);
+      // skicka parsedCode till AI
+      // Does nothing for now
+      // const response = await AICon.getChatResponse(parsedCode);
       // console.log("DiagramCode:", AICon.diagramCode);
       //const diagramCode = AICon.diagramCode;
 
