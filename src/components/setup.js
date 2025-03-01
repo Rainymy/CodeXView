@@ -1,6 +1,3 @@
-"use strict";
-const vscode = require("vscode");
-
 const { ensureFolderSync } = require("../utils/fileHandler");
 const ProjectConfig = require("./ProjectConfig");
 

@@ -1,6 +1,11 @@
 const pako = require("pako");
 
-function encode6bit(b) {
+/**
+* @param {Number} c
+* @returns
+*/
+function encode6bit(c) {
+  let b = c;
   if (b < 10) return String.fromCharCode(48 + b);    // 0-9
   b -= 10;
   if (b < 26) return String.fromCharCode(65 + b);    // A-Z
@@ -10,6 +15,12 @@ function encode6bit(b) {
   return b === 0 ? '-' : '_';                        // - or _
 }
 
+/**
+* @param {Number} b1
+* @param {Number} b2
+* @param {Number} b3
+* @returns
+*/
 function append3bytes(b1, b2, b3) {
   const c1 = b1 >> 2;
   const c2 = ((b1 & 0x3) << 4) | (b2 >> 4);

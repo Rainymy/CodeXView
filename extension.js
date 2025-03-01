@@ -1,6 +1,3 @@
-"use strict";
-
-
 const path = require("path");
 const vscode = require('vscode');
 
@@ -8,15 +5,17 @@ const { fetchFileToAnalyze } = require('./src/utils/activeDocument');
 
 const { parseCode, syntaxTreeToJson } = require('./src/components/codeParser');
 const { generateCCDDiagram } = require('./src/components/diagramGenerator');
+
 const AIConnection = require('./src/components/aiConnection');
 const ProjectConfig = require("./src/components/ProjectConfig");
+const Keyvault = require("./src/components/Keyvault");
 const codexview = require("./src/components/setup");
 
 const Notify = {
   info: vscode.window.showInformationMessage,
   warning: vscode.window.showWarningMessage,
   error: vscode.window.showErrorMessage
-}
+};
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -25,14 +24,18 @@ function activate(context) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with  registerCommand
   // The commandId parameter must match the command field in package.json
-  const disposable = vscode.commands.registerCommand('codexview.run', async function () {
+  const disposable = vscode.commands.registerCommand('codexview.run', async () => {
     // empty for now
     codexview.setup();
+    // access keyvault
+    Keyvault.init();
+
+    const secretFromVault = await Keyvault.getSecret();
 
     // read configs from jsonc
     ProjectConfig.load(path.join(__dirname, "./config.jsonc"));
 
-    let selectedFile = await fetchFileToAnalyze();
+    const selectedFile = await fetchFileToAnalyze();
 
     if (selectedFile.length > 0) {
       Notify.info('CodeXView! Found File...');
@@ -47,8 +50,8 @@ function activate(context) {
 
       Notify.info('CodeXView! Started...');
 
-      const parsedCode = await parseCode(selectedFile);
-      const parsedJson = syntaxTreeToJson(parsedCode);
+      // const parsedCode = await parseCode(selectedFile);
+      // const parsedJson = syntaxTreeToJson(parsedCode);
 
       Notify.info('CodeXView! Processing......');
       // console.log(parsedCode.printDotGraph());
