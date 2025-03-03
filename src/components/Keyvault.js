@@ -1,6 +1,10 @@
 const { SecretClient } = require("@azure/keyvault-secrets");
 const { DefaultAzureCredential } = require("@azure/identity");
 
+const SECRET_ENUM = {
+  KEY: "KEY",
+  URL: "URL"
+}
 
 /**
 * KeyVault is a singleton.
@@ -14,8 +18,8 @@ function KeyVault() {
   let client = null;
 
   const secretKeys = {
-    KEY: "Ai-Key-mini-o1",
-    URL: "Ai-url-mini-o1"
+    [SECRET_ENUM.KEY]: "Ai-Key-mini-o1",
+    [SECRET_ENUM.URL]: "Ai-url-mini-o1"
   };
 
   /**
@@ -32,18 +36,16 @@ function KeyVault() {
   */
   this.getSecret = async (key) => {
     if (!client) throw Error("Client not found");
-    if (typeof key !== "string") throw Error("Invalid key")
-
-    const objKeys = Object.keys(secretKeys);
-    const getKey = objKeys.find((v) => key === v.toLowerCase());
+    if (typeof key !== "string" || !secretKeys[key]) throw Error("Invalid key")
 
     // getSecret throws if secret not found.
-    const secret = await client.getSecret(getKey ?? key);
-
-    console.log(secret);
+    const secret = await client.getSecret(secretKeys[key]);
 
     return secret.value;
   }
 }
 
-module.exports = new KeyVault();
+module.exports = {
+  KeyVault: new KeyVault(),
+  SECRET_ENUM: SECRET_ENUM
+}

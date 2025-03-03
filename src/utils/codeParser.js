@@ -1,6 +1,6 @@
 const Parser = require("tree-sitter");
-const { customReadStream: readStream } = require("../utils/fileHandler")
-const { detectLanguageByPath } = require("../utils/detectLanguage")
+const { customReadStream: readStream } = require("./fileHandler")
+const { detectLanguageByPath } = require("./detectLanguage")
 
 /**
 * @param {String} filePath
@@ -11,10 +11,13 @@ async function parseCode(filePath) {
   const lang = detectLanguageByPath(filePath);
   parser.setLanguage(lang);
 
-  const tree = parser.parse(await readStream(filePath));
-  return tree
+  return parser.parse(await readStream(filePath));
 }
 
+/**
+* @param {Parser.Tree} tree
+* @returns
+*/
 function syntaxTreeToJson(tree) {
   if (!tree || !tree.rootNode) {
     throw new Error("Invalid syntax tree");
@@ -22,9 +25,14 @@ function syntaxTreeToJson(tree) {
   return syntaxNodeToJson(tree.rootNode);
 }
 
-// ✅ Helper function to recursively convert a SyntaxNode to JSON
+/**
+* ✅ Helper function to recursively convert a SyntaxNode to JSON
+* @param {Parser.SyntaxNode} node
+* @returns
+*/
 function syntaxNodeToJson(node) {
-  // TODO: CONVERT THIS INTO WHILE LOOP (Recursively is bad idea with huge data)
+  // TODO: CONVERT THIS INTO WHILE LOOP
+  // (Recursively is bad idea with huge data)
   return {
     type: node.type,
     text: node.text, // Extract raw text

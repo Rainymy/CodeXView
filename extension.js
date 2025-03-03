@@ -1,14 +1,14 @@
-const path = require("path");
+const path = require("node:path");
 const vscode = require('vscode');
 
 const { fetchFileToAnalyze } = require('./src/utils/activeDocument');
 
-const { parseCode, syntaxTreeToJson } = require('./src/components/codeParser');
+const { parseCode, syntaxTreeToJson } = require('./src/utils/codeParser');
 const { generateCCDDiagram } = require('./src/components/diagramGenerator');
 
 const AIConnection = require('./src/components/AIConnection');
 const ProjectConfig = require("./src/components/ProjectConfig");
-const Keyvault = require("./src/components/Keyvault");
+const { KeyVault } = require("./src/components/Keyvault");
 const codexview = require("./src/components/setup");
 
 const Notify = {
@@ -28,7 +28,7 @@ function activate(context) {
     // empty for now
     codexview.setup();
     // access keyvault
-    Keyvault.init();
+    KeyVault.init();
 
     // read configs from jsonc
     ProjectConfig.load(path.join(__dirname, "./config.jsonc"));
@@ -58,7 +58,7 @@ function activate(context) {
       //ta ut information från parsade koden, som fil count och namn, functions count+namn
       // och samma för variabler till resultats checkning
 
-      const AICon = new AIConnection().init();
+      const AICon = await (new AIConnection()).init();
 
       // skicka parsedCode till AI
       // Does nothing for now
