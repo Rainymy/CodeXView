@@ -16,6 +16,10 @@
       {
         "command": "codexview.run",
         "title": "Run CodeXView"
+      },
+      {
+        "command": "codexview.runmultiple",
+        "title": "Run CodeXView multiple files"
       }
     ]
   },

@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 
-const {parseCode} = require('./Components/codeParser');
-const {analyzeFile} = require('./Utils/Filemanager');
+const {parseCode, parseCodeBase} = require('./Components/codeParser');
+const {analyzeFile, getWorkspaceFolder} = require('./Utils/Filemanager');
 const {generateCCDDiagram} = require('./Components/diagramGenerator');
 const path = require("path");
 // Import the module and reference it with the alias vscode in your code below
@@ -52,12 +52,7 @@ function activate(context) {
 			// kolla om det stämmer
 		
 			// add diagram to project
-			var added = await generateCCDDiagram(diagramCode, folderPath,folderName);
-			if(added){
-				vscode.window.showInformationMessage('CodeXView! Finnished, Diagram has been added to your project...');
-			} else{
-				vscode.window.showErrorMessage('CodeXView! Error adding diagram to project...');
-			}
+			await addDiagramToProject(diagramCode, folderPath, folderName);
 			
 
 		} else {
@@ -66,8 +61,47 @@ function activate(context) {
 
 	});
 
+	const disposable2 = vscode.commands.registerCommand("codexview.runmultiple", async function () {
+		try {
+			var folder = await getWorkspaceFolder();
+			if (!folder) {
+				vscode.window.showErrorMessage("❌ No workspace folder found.");
+				return;
+			}
+	
+			vscode.window.showInformationMessage("🔍 CodeXView! Found Codebase...");
+			vscode.window.showInformationMessage("🚀 CodeXView! Started...");
+			
+			const folderName = path.basename(folder);
+			const parsedCode = await parseCodeBase(folder);
+	
+			if (!parsedCode) {
+				vscode.window.showErrorMessage("❌ Code parsing failed.");
+				return;
+			}
+	
+			console.log("Parsed Code:", parsedCode);
+			let diagramCode = "";
+			
+		
+			await addDiagramToProject(diagramCode, folder, folderName);
+	
+		} catch (error) {
+			vscode.window.showErrorMessage(`❌ Error: ${error.message}`);
+			console.error(error);
+		}
+	});
 
-	context.subscriptions.push(disposable);
+	async function addDiagramToProject(diagramCode, folderPath, folderName){
+		var added = await generateCCDDiagram(diagramCode, folderPath,folderName);
+		if(added){
+			vscode.window.showInformationMessage('CodeXView! Finnished, Diagram has been added to your project...');
+		} else{
+			vscode.window.showErrorMessage('CodeXView! Error adding diagram to project...');
+		}
+	}
+
+	context.subscriptions.push(disposable, disposable2);
 }
 
 // This method is called when your extension is deactivated

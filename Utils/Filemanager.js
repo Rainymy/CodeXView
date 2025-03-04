@@ -32,4 +32,11 @@ async function getSelectedFile() {
     return files[0].fsPath;
 }
 
-module.exports = { analyzeFile };
+function getWorkspaceFolder() {
+    if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+        return vscode.workspace.workspaceFolders[0].uri.fsPath; 
+    }
+    return null;
+}
+
+module.exports = { analyzeFile, getWorkspaceFolder };
