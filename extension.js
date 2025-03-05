@@ -1,10 +1,11 @@
 "use strict";
 
+import { parseCodeBase } from "./Components/codeParser";
 
 const path = require("path");
 const vscode = require('vscode');
 
-const { fetchFileToAnalyze } = require('./src/utils/activeDocument');
+const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDocument');
 
 const { parseCode, syntaxTreeToJson } = require('./src/components/codeParser');
 const { generateCCDDiagram } = require('./src/components/diagramGenerator');
@@ -25,7 +26,7 @@ function activate(context) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with  registerCommand
   // The commandId parameter must match the command field in package.json
-  const disposable = vscode.commands.registerCommand('codexview.run', async function () {
+  const disposable = vscode.commands.registerCommand('codexview.run', async () => {
     // empty for now
     codexview.setup();
 
@@ -71,17 +72,45 @@ function activate(context) {
       } else {
         Notify.error('CodeXView! Error adding diagram to project...');
       }
-
-
     } else {
       Notify.error('No file selected.');
     }
-
   });
 
+  const disposable2 = vscode.commands.registerCommand("codexview.runmultiple", async () => {
+    try {
+      const folder = getWorkspaceFolder();
+      if (!folder) {
+        vscode.window.showErrorMessage("❌ No workspace folder found.");
+        return;
+      }
 
-  context.subscriptions.push(disposable);
+      vscode.window.showInformationMessage("🔍 CodeXView! Found Codebase...");
+      vscode.window.showInformationMessage("🚀 CodeXView! Started...");
+
+      const folderName = path.basename(folder);
+      const parsedCode = await parseCodeBase(folder);
+
+      if (!parsedCode) {
+        vscode.window.showErrorMessage("❌ Code parsing failed.");
+        return;
+      }
+
+      console.log("Parsed Code:", parsedCode);
+      let diagramCode = "";
+
+
+      // await addDiagramToProject(diagramCode, folder, folderName);
+
+    } catch (error) {
+      vscode.window.showErrorMessage(`❌ Error: ${error.message}`);
+      console.error(error);
+    }
+  });
+
+  context.subscriptions.push(disposable, disposable2);
 }
+
 
 // This method is called when your extension is deactivated
 function deactivate() { }
