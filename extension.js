@@ -1,7 +1,7 @@
 const path = require("path");
 const vscode = require('vscode');
 
-const { parseCodeBase } = require("./Components/codeParser");
+const { parseCodeBase } = require("./src/components/codebaseParser");
 const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDocument');
 
 const { parseCode, syntaxTreeToJson } = require('./src/utils/codeParser');

@@ -26,10 +26,19 @@ async function selectFile() {
   return files[0].fsPath;
 }
 
+function getWorkspaceFolder() {
+  const workspace = vscode.workspace.workspaceFolders;
+  if (workspace && workspace.length > 0) {
+    return workspace[0].uri.fsPath;
+  }
+  return null;
+}
+
 async function fetchFileToAnalyze() {
   return getActiveDocumentFile() ?? await selectFile();
 }
 
 module.exports = {
-  fetchFileToAnalyze: fetchFileToAnalyze
+  fetchFileToAnalyze: fetchFileToAnalyze,
+  getWorkspaceFolder: getWorkspaceFolder
 };

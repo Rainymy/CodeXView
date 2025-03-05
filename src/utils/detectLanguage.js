@@ -11,27 +11,13 @@ const Ruby = require('tree-sitter-ruby');
 * @returns
 */
 function detectLanguageByPath(filePath) {
-  if (filePath.endsWith(".js")) {
-    return JavaScript;
-  }
-  if (filePath.endsWith(".cs")) {
-    return Csharp;
-  }
-  if (filePath.endsWith(".py")) {
-    return Python;
-  }
-  if (filePath.endsWith(".c")) {
-    return C;
-  }
-  if (filePath.endsWith(".java")) {
-    return Java;
-  }
-  if (filePath.endsWith(".cpp")) {
-    return Cpp;
-  }
-  if (filePath.endsWith(".rb")) {
-    return Ruby;
-  }
+  if (filePath.endsWith(".js")) return JavaScript;
+  if (filePath.endsWith(".cs")) return Csharp;
+  if (filePath.endsWith(".py")) return Python;
+  if (filePath.endsWith(".c")) return C;
+  if (filePath.endsWith(".java")) return Java;
+  if (filePath.endsWith(".cpp")) return Cpp;
+  if (filePath.endsWith(".rb")) return Ruby;
 }
 
 module.exports = {
