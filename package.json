@@ -37,13 +37,21 @@
     "eslint": "^9.16.0"
   },
   "dependencies": {
+    "@azure/identity": "^4.7.0",
+    "@azure/keyvault-secrets": "^4.9.0",
+    "@azure/openai": "^2.0.0",
     "axios": "^1.8.1",
+    "dotenv": "^16.4.7",
+    "jsonc-parser": "^3.3.1",
     "node-plantuml": "^0.9.0",
     "pako": "^2.1.0",
     "tree-sitter": "^0.21.1",
+    "tree-sitter-c": "0.23.5",
     "tree-sitter-c-sharp": "^0.23.1",
     "tree-sitter-cpp": "^0.23.4",
     "tree-sitter-java": "^0.23.5",
+    "tree-sitter-javascript": "^0.23.1",
+    "tree-sitter-python": "0.23.6",
     "tree-sitter-ruby": "^0.23.1"
   }
 }
