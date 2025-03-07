@@ -23,8 +23,8 @@ function ProjectConfig() {
     this.validate(config);
 
     saveFolder = config?.saveFolder;
-    createFolder = parseBoolFromString(config?.canCreateFolder);
-    createFile = parseBoolFromString(config?.canCreateFile);
+    createFolder = config?.canCreateFolder ?? false;
+    createFile = config?.canCreateFile ?? false;
   }
 
   /**
@@ -43,13 +43,6 @@ function ProjectConfig() {
     if (!inputConfig.canCreateFolder || !inputConfig.canCreateFile) {
       throw Error("Invalid permission in config.");
     }
-  }
-
-  function parseBoolFromString(str = "") {
-    if (str.length === 0) return false;
-    if (str.toLowerCase() === "true") return true;
-
-    return false;
   }
 }
 
