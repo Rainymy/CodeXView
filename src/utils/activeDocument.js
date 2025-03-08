@@ -31,5 +31,6 @@ async function fetchFileToAnalyze() {
 }
 
 module.exports = {
-  fetchFileToAnalyze: fetchFileToAnalyze
+  fetchFileToAnalyze: fetchFileToAnalyze,
+  getActiveDocumentFile: getActiveDocumentFile,
 };

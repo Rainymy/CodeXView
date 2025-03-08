@@ -1,11 +1,11 @@
 "use strict";
 
-import { parseCodeBase } from "./Components/codeParser";
+const { parseCodeBase } = require("./Components/codeParser");
 
 const path = require("path");
 const vscode = require('vscode');
 
-const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDocument');
+const { fetchFileToAnalyze, getActiveDocumentFile } = require('./src/utils/activeDocument');
 
 const { parseCode, syntaxTreeToJson } = require('./src/components/codeParser');
 const { generateCCDDiagram } = require('./src/components/diagramGenerator');
@@ -52,21 +52,17 @@ function activate(context) {
       const parsedJson = syntaxTreeToJson(parsedCode);
 
       Notify.info('CodeXView! Processing......');
-      // console.log(parsedCode.printDotGraph());
-      // console.log("Parsed JSON:", parsedJson);
 
       //ta ut information från parsade koden, som fil count och namn, functions count+namn
       // och samma för variabler till resultats checkning
 
       // skicka parsedCode till AI
-      // const AICon = await AIConnection;
-
-      // await AICon.getChatResponse(parsedCode);
-      // console.log("DiagramCode:", AICon.diagramCode);
-      //const diagramCode = AICon.diagramCode;
-
+      await AIConnection;
+      await AIConnection.getChatResponse(parsedJson);
+      console.log("DiagramCode:", AIConnection.diagramCode);
+    
       // add diagram to project
-      const added = await generateCCDDiagram();
+      const added = await generateCCDDiagram(AIConnection.diagramCode);
       if (added) {
         Notify.info('CodeXView! Finnished, Diagram has been added to your project...');
       } else {
@@ -79,7 +75,7 @@ function activate(context) {
 
   const disposable2 = vscode.commands.registerCommand("codexview.runmultiple", async () => {
     try {
-      const folder = getWorkspaceFolder();
+      const folder = getActiveDocumentFile();
       if (!folder) {
         vscode.window.showErrorMessage("❌ No workspace folder found.");
         return;

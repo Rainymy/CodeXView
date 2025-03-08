@@ -7,9 +7,10 @@ const axios = require("axios");
 const ProjectConfig = require("./ProjectConfig");
 const PlantUML = require("./PlantUML_base64");
 
-async function generateCCDiagram() {
-  const plantumlUrl = PlantUML.generateURL(PlantUML.encoder(exampleccdDiagram))
-  // console.log(`Fetching diagram from: ${plantumlUrl}`);
+async function generateCCDiagram(diagramCode) {
+  const cleanedOutput = diagramCode.replace(/^```plantuml\s*/i, '').replace(/\s*```$/, ''); 
+  
+  const plantumlUrl = PlantUML.generateURL(PlantUML.encoder(cleanedOutput))
 
   let response;
   try {
@@ -31,12 +32,6 @@ async function generateCCDiagram() {
 
   return true;
 }
-
-const exampleccdDiagram = `
-  @startuml
-  Bob -> Alice : hellorequest
-  @enduml
-`;
 
 function getNextFileName() {
   const outputFolder = ProjectConfig.getOutputFolder();
