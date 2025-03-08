@@ -1,13 +1,28 @@
-
 class AIConnection {
     constructor() {
-        this.apiUrl = "";
+        this.apiUrl = ""; 
         this.diagramCode = "";
     }
     
     async getChatResponse(parsedCode) {
-        // send parsedCode to AI
-        // Connect to AI trough azure online app.
+      try {
+        const response = await fetch('http://localhost:5191/o1Chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ userMessage: parsedCode })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        
+        this.diagramCode = await response.text();
+        
+      } catch (error) {
+        console.error('Error:', error);
+      }
     }
 }
 
