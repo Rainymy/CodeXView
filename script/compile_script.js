@@ -21,6 +21,7 @@ const BUILD_TARGET = {
 
 printFancyTitle(` Compiler Script. `);
 child_process.execSync("npm install", { stdio: "inherit" });
+child_process.execSync("npm audit fix", { stdio: "inherit" });
 
 // main entry
 for (const platform of Object.keys(BUILD_TARGET)) {
