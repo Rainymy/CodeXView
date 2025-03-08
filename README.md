@@ -63,3 +63,10 @@ You can author your README using Visual Studio Code.  Here are some useful edito
 * [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Enjoy!**
+
+## License
+
+All prebuilt binaries included in this project (located in the `prebuilds/` folder) are distributed under the MIT License. The full license text is available in the [`LICENSE`](./prebuild/win32-x64/LICENSE) file.
+
+By using this software, you agree to the terms of the MIT License.
+
