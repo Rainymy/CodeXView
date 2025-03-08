@@ -7,7 +7,7 @@ const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDo
 const { parseCode, syntaxTreeToJson } = require('./src/utils/codeParser');
 const { generateCCDDiagram } = require('./src/components/diagramGenerator');
 
-const AIConnection = require('./src/components/AIConnection');
+const AIConnection = require("./src/components/aiConnection");
 const ProjectConfig = require("./src/components/ProjectConfig");
 const { KeyVault } = require("./src/components/Keyvault");
 const codexview = require("./src/components/setup");
@@ -49,26 +49,20 @@ function activate(context) {
 
       Notify.info('CodeXView! Started...');
 
-      // const parsedCode = await parseCode(selectedFile);
-      // const parsedJson = syntaxTreeToJson(parsedCode);
+      const parsedCode = await parseCode(selectedFile);
+      const parsedJson = syntaxTreeToJson(parsedCode);
 
       Notify.info('CodeXView! Processing......');
-      // console.log(parsedCode.printDotGraph());
-      // console.log("Parsed JSON:", parsedJson);
 
       //ta ut information från parsade koden, som fil count och namn, functions count+namn
       // och samma för variabler till resultats checkning
 
-      const AICon = await (new AIConnection()).init();
+      // const AICon = await (new AIConnection()).init();
 
-      // skicka parsedCode till AI
-      // Does nothing for now
-      // const response = await AICon.getChatResponse(parsedCode);
-      // console.log("DiagramCode:", AICon.diagramCode);
-      //const diagramCode = AICon.diagramCode;
-
+      await AIConnection.getChatResponse(parsedJson);
+      console.log("DiagramCode:", AIConnection.diagramCode);
       // add diagram to project
-      const added = await generateCCDDiagram();
+      const added = await generateCCDDiagram(AIConnection.diagramCode);
       if (added) {
         Notify.info('CodeXView! Finnished, Diagram has been added to your project...');
       } else {
