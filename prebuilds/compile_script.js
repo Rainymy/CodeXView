@@ -19,6 +19,9 @@ const BUILD_TARGET = {
   [BUILD_PLATFROM.MAC]: [BUILD_ARCH.X64, BUILD_ARCH.ARM64],
 }
 
+printFancyTitle(` Compiler Script. `);
+child_process.execSync("npm install", { stdio: "inherit" });
+
 // main entry
 for (const platform of Object.keys(BUILD_TARGET)) {
   for (const arch of BUILD_TARGET[platform]) {
