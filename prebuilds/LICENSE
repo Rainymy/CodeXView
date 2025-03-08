@@ -6,8 +6,33 @@ The complete licensing terms for each component are provided below.
 
 --------------------------------------------------------------------------------
 For file: tree-sitter-javascript.node
+Copyright (c)
+    2014 Max Brunsfeld
 --------------------------------------------------------------------------------
-Copyright (c) 2014 Max Brunsfeld
+For file: tree-sitter-python.node
+Copyright (c)
+    2016 Max Brunsfeld
+--------------------------------------------------------------------------------
+For file: tree-sitter-c-sharp.node
+Copyright (c)
+    2014-2023 Max Brunsfeld, Damien Guard, Amaan Qureshi, and contributors.
+--------------------------------------------------------------------------------
+For file: tree-sitter-c.node
+Copyright (c)
+    2014 Max Brunsfeld
+--------------------------------------------------------------------------------
+For file: tree-sitter-cpp.node
+Copyright (c)
+    2014 Max Brunsfeld
+--------------------------------------------------------------------------------
+For file: tree-sitter-java.node
+Copyright (c)
+    2017 Ayman Nadeem
+--------------------------------------------------------------------------------
+For file: tree-sitter-ruby.node
+Copyright (c)
+    2016 Rob Rix
+--------------------------------------------------------------------------------
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
