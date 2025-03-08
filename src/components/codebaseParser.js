@@ -6,6 +6,7 @@ const path = require("path");
 
 const { detectLanguageByPath } = require('../utils/detectLanguage');
 
+// Use github linguest package to identify/analys projact.
 async function parseCodeBase(folderPath) {
   if (!fs.existsSync(folderPath) || !fs.statSync(folderPath).isDirectory()) {
     throw new Error("❌ Invalid folder path");
