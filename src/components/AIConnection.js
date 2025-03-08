@@ -1,12 +1,11 @@
 class AIConnection {
   constructor() {
     this.apiUrl = "";
-    this.diagramCode = "";
   }
 
   async getChatResponse(parsedCode) {
     try {
-      const response = await fetch('http://localhost:5191/o1Chat', {
+      const response = await fetch('localhost:5191/o1Chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -18,7 +17,7 @@ class AIConnection {
         throw new Error('Network response was not ok ' + response.statusText);
       }
 
-      this.diagramCode = await response.text();
+      return await response.text();
 
     } catch (error) {
       console.error('Error:', error);

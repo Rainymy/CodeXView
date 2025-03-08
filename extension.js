@@ -5,7 +5,7 @@ const { parseCodeBase } = require("./src/components/codebaseParser");
 const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDocument');
 
 const { parseCode, syntaxTreeToJson } = require('./src/utils/codeParser');
-const { generateCCDDiagram } = require('./src/components/diagramGenerator');
+const { generateCCDiagram } = require('./src/components/diagramGenerator');
 
 const AIConnection = require("./src/components/aiConnection");
 const ProjectConfig = require("./src/components/ProjectConfig");
@@ -54,15 +54,23 @@ function activate(context) {
 
       Notify.info('CodeXView! Processing......');
 
+      console.log("printDotGraph: ", parsedCode.printDotGraph());
+
       //ta ut information från parsade koden, som fil count och namn, functions count+namn
       // och samma för variabler till resultats checkning
 
       // const AICon = await (new AIConnection()).init();
 
-      await AIConnection.getChatResponse(parsedJson);
-      console.log("DiagramCode:", AIConnection.diagramCode);
+      const diagram = await AIConnection.getChatResponse(parsedJson);
+      console.log("DiagramCode:", diagram);
+
+      if (!diagram) {
+        Notify.info('CodeXView! Failed to generate Diagram.');
+        return;
+      }
+
       // add diagram to project
-      const added = await generateCCDDiagram(AIConnection.diagramCode);
+      const added = await generateCCDiagram(diagram);
       if (added) {
         Notify.info('CodeXView! Finnished, Diagram has been added to your project...');
       } else {
@@ -77,29 +85,28 @@ function activate(context) {
     try {
       const folder = getWorkspaceFolder();
       if (!folder) {
-        vscode.window.showErrorMessage("❌ No workspace folder found.");
+        Notify.error("❌ No workspace folder found.");
         return;
       }
 
-      vscode.window.showInformationMessage("🔍 CodeXView! Found Codebase...");
-      vscode.window.showInformationMessage("🚀 CodeXView! Started...");
+      Notify.info("🔍 CodeXView! Found Codebase...");
+      Notify.info("🚀 CodeXView! Started...");
 
       const folderName = path.basename(folder);
       const parsedCode = await parseCodeBase(folder);
 
       if (!parsedCode) {
-        vscode.window.showErrorMessage("❌ Code parsing failed.");
+        Notify.error("❌ Code parsing failed.");
         return;
       }
 
       console.log("Parsed Code:", parsedCode);
       let diagramCode = "";
 
-
       // await addDiagramToProject(diagramCode, folder, folderName);
 
     } catch (error) {
-      vscode.window.showErrorMessage(`❌ Error: ${error.message}`);
+      Notify.error(`❌ Error: ${error.message}`);
       console.error(error);
     }
   });
@@ -115,5 +122,3 @@ module.exports = {
   activate,
   deactivate
 }
-
-

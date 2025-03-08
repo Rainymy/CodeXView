@@ -7,8 +7,8 @@ const ProjectConfig = require("./ProjectConfig");
 const PlantUML = require("./PlantUML_base64");
 
 async function generateCCDiagram(diagramCode) {
-  const cleanedOutput = diagramCode.replace(/^```plantuml\s*/i, '').replace(/\s*```$/, ''); 
-  
+  const cleanedOutput = diagramCode.replace(/^```plantuml\s*/i, '').replace(/\s*```$/, '');
+
   const plantumlUrl = PlantUML.generateURL(PlantUML.encoder(cleanedOutput))
 
   let response;
@@ -43,5 +43,4 @@ function getNextFileName() {
     : path.join(outputFolder, `${projectName}_CCD_Diagram.png`);
 }
 
-
-module.exports = { generateCCDDiagram: generateCCDiagram };
+module.exports = { generateCCDiagram: generateCCDiagram };
