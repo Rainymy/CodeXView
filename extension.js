@@ -1,23 +1,22 @@
-"use strict";
-
-const { parseCodeBase } = require("./Components/codeParser");
-
 const path = require("path");
 const vscode = require('vscode');
 
-const { fetchFileToAnalyze, getActiveDocumentFile } = require('./src/utils/activeDocument');
+const { parseCodeBase } = require("./src/components/codebaseParser");
+const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDocument');
 
-const { parseCode, syntaxTreeToJson } = require('./src/components/codeParser');
-const { generateCCDDiagram } = require('./src/components/diagramGenerator');
-const AIConnection = require('./src/components/aiConnection');
+const { parseCode, syntaxTreeToJson } = require('./src/utils/codeParser');
+const { generateCCDiagram } = require('./src/components/diagramGenerator');
+
+const AIConnection = require("./src/components/aiConnection");
 const ProjectConfig = require("./src/components/ProjectConfig");
+const { KeyVault } = require("./src/components/Keyvault");
 const codexview = require("./src/components/setup");
 
 const Notify = {
   info: vscode.window.showInformationMessage,
   warning: vscode.window.showWarningMessage,
   error: vscode.window.showErrorMessage
-}
+};
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -29,11 +28,13 @@ function activate(context) {
   const disposable = vscode.commands.registerCommand('codexview.run', async () => {
     // empty for now
     codexview.setup();
+    // access keyvault
+    KeyVault.init();
 
     // read configs from jsonc
     ProjectConfig.load(path.join(__dirname, "./config.jsonc"));
 
-    let selectedFile = await fetchFileToAnalyze();
+    const selectedFile = await fetchFileToAnalyze();
 
     if (selectedFile.length > 0) {
       Notify.info('CodeXView! Found File...');
@@ -53,16 +54,23 @@ function activate(context) {
 
       Notify.info('CodeXView! Processing......');
 
+      console.log("printDotGraph: ", parsedCode.printDotGraph());
+
       //ta ut information från parsade koden, som fil count och namn, functions count+namn
       // och samma för variabler till resultats checkning
 
-      // skicka parsedCode till AI
-      await AIConnection;
-      await AIConnection.getChatResponse(parsedJson);
-      console.log("DiagramCode:", AIConnection.diagramCode);
-    
+      // const AICon = await (new AIConnection()).init();
+
+      const diagram = await AIConnection.getChatResponse(parsedJson);
+      console.log("DiagramCode:", diagram);
+
+      if (!diagram) {
+        Notify.info('CodeXView! Failed to generate Diagram.');
+        return;
+      }
+
       // add diagram to project
-      const added = await generateCCDDiagram(AIConnection.diagramCode);
+      const added = await generateCCDiagram(diagram);
       if (added) {
         Notify.info('CodeXView! Finnished, Diagram has been added to your project...');
       } else {
@@ -75,31 +83,30 @@ function activate(context) {
 
   const disposable2 = vscode.commands.registerCommand("codexview.runmultiple", async () => {
     try {
-      const folder = getActiveDocumentFile();
+      const folder = getWorkspaceFolder();
       if (!folder) {
-        vscode.window.showErrorMessage("❌ No workspace folder found.");
+        Notify.error("❌ No workspace folder found.");
         return;
       }
 
-      vscode.window.showInformationMessage("🔍 CodeXView! Found Codebase...");
-      vscode.window.showInformationMessage("🚀 CodeXView! Started...");
+      Notify.info("🔍 CodeXView! Found Codebase...");
+      Notify.info("🚀 CodeXView! Started...");
 
       const folderName = path.basename(folder);
       const parsedCode = await parseCodeBase(folder);
 
       if (!parsedCode) {
-        vscode.window.showErrorMessage("❌ Code parsing failed.");
+        Notify.error("❌ Code parsing failed.");
         return;
       }
 
       console.log("Parsed Code:", parsedCode);
       let diagramCode = "";
 
-
       // await addDiagramToProject(diagramCode, folder, folderName);
 
     } catch (error) {
-      vscode.window.showErrorMessage(`❌ Error: ${error.message}`);
+      Notify.error(`❌ Error: ${error.message}`);
       console.error(error);
     }
   });
@@ -115,5 +122,3 @@ module.exports = {
   activate,
   deactivate
 }
-
-

@@ -1,15 +1,14 @@
-const { customWriteStream } = require("../utils/fileHandler");
-
-const fs = require('fs');
-const path = require('path');
+const path = require('node:path');
 const axios = require("axios");
+
+const { customWriteStream, readdirSync } = require("../utils/fileHandler");
 
 const ProjectConfig = require("./ProjectConfig");
 const PlantUML = require("./PlantUML_base64");
 
 async function generateCCDiagram(diagramCode) {
-  const cleanedOutput = diagramCode.replace(/^```plantuml\s*/i, '').replace(/\s*```$/, ''); 
-  
+  const cleanedOutput = diagramCode.replace(/^```plantuml\s*/i, '').replace(/\s*```$/, '');
+
   const plantumlUrl = PlantUML.generateURL(PlantUML.encoder(cleanedOutput))
 
   let response;
@@ -37,12 +36,11 @@ function getNextFileName() {
   const outputFolder = ProjectConfig.getOutputFolder();
   const projectName = ProjectConfig.getOutputParentFolder();
 
-  const pngFiles = fs.readdirSync(outputFolder).filter(file => file.endsWith(".png"));
+  const pngFiles = readdirSync(outputFolder).filter(file => file.endsWith(".png"));
 
   return (pngFiles.length > 0)
     ? path.join(outputFolder, `${projectName}_CCD_Diagram_v${pngFiles.length + 1}.png`)
     : path.join(outputFolder, `${projectName}_CCD_Diagram.png`);
 }
 
-
-module.exports = { generateCCDDiagram: generateCCDiagram };
+module.exports = { generateCCDiagram: generateCCDiagram };

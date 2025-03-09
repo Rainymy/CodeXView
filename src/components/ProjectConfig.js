@@ -14,42 +14,40 @@ function ProjectConfig() {
   this.getOutputFolder = () => path.join(rootPath, saveFolder);
   this.getOutputParentFolder = () => path.basename(rootPath);
 
+  /** @param {String} rootPathFs */
+  this.setRootPath = (rootPathFs) => rootPath = rootPathFs;
+
   /**
   * @param {String} configPathFs
   * @throws {Error} Throws error if any important proparty is undefined.
   */
   this.load = (configPathFs) => {
     config = readJSONFileSync(configPathFs);
-    this.validate(config);
+    const error = this.validate(config);
+
+    if (error) {
+      throw Error(error);
+    }
 
     saveFolder = config?.saveFolder;
-    createFolder = parseBoolFromString(config?.canCreateFolder);
-    createFile = parseBoolFromString(config?.canCreateFile);
-  }
-
-  /**
-  * @param {String} rootPathFs
-  */
-  this.setRootPath = (rootPathFs) => {
-    rootPath = rootPathFs;
+    createFolder = config?.canCreateFolder ?? false;
+    createFile = config?.canCreateFile ?? false;
   }
 
   /**
   * @param {object} inputConfig
-  * @throws {Error} Throws error if any important proparty is undefined.
+  * @returns {String | undefined} Returns `string` for error.
   */
   this.validate = (inputConfig) => {
-    if (!inputConfig.saveFolder) throw Error("Invalid save folder.");
-    if (!inputConfig.canCreateFolder || !inputConfig.canCreateFile) {
-      throw Error("Invalid permission in config.");
+    if (!inputConfig) return "Invalid Configuration.";
+    if (!inputConfig.saveFolder) return "Invalid save folder.";
+
+    const canCreateFolder = typeof inputConfig.canCreateFolder === "boolean";
+    const canCreateFile = typeof inputConfig.canCreateFile === "boolean";
+
+    if (!canCreateFolder || !canCreateFile) {
+      return "Invalid permission in config.";
     }
-  }
-
-  function parseBoolFromString(str = "") {
-    if (str.length === 0) return false;
-    if (str.toLowerCase() === "true") return true;
-
-    return false;
   }
 }
 
