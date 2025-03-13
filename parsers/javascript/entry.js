@@ -1,11 +1,11 @@
 const path = require("path");
-const { pathToBinary } = require("../provider");
 
 /**
-* @type {import("../language.d.ts").languageEntry} LanguageEntry
+* @type {import("../language").languageEntry} LanguageEntry
 */
 const entry = {
-  absolutePath: path.join(pathToBinary, "./tree-sitter-javascript.node")
+  name: "javascript",
+  absolutePath: path.join(__dirname, "./tree-sitter-javascript.wasm")
 };
 
 module.exports = entry;

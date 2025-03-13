@@ -24,11 +24,13 @@ type Language = {
 
 type LoadEntry = {
   entry: Language | null,
-  error: Error | null
+  error: Error | null,
+  extra: languageEntry | null
 }
 
 type languageEntry = {
-  absolutePath: string
+  absolutePath: string,
+  name: string
 }
 
 export declare const language: Language;

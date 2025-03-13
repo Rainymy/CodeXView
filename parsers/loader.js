@@ -1,18 +1,23 @@
-const path = require("path");
-const fs = require("fs");
 const pico = require("picocolors");
+const fs = require("fs");
 
-const { binaryEntries } = require("./provider");
+const { Parser, Language } = require("web-tree-sitter");
+
+const { parseFolder } = require("./provider");
 
 /**
- * @typedef {import('./language.d.ts').Language} Language
  * @typedef {import('./language.d.ts').LoadEntry} LoadEntry
+ * @typedef {import('./language.d.ts').languageEntry} languageEntry
  */
 
+/** @type {Parser} */
+let parser = null;
+const lang_parsers = new Map();
 
-function load_parsers() {
-  /** @type {Map<String, Language>} */
-  const lang_parsers = new Map();
+async function load_parsers() {
+  await Parser.init();
+  parser = new Parser();
+
   const shadow = new Map();
   const entries = parseFolder();
 
@@ -21,7 +26,7 @@ function load_parsers() {
   }
 
   for (const entry of entries) {
-    const { entry: config, error } = loadEntry(entry);
+    const { entry: config, error, extra } = await loadEntry(entry);
 
     if (error) {
       console.error(pico.red(` - Fail to load: ${entry}`));
@@ -29,66 +34,46 @@ function load_parsers() {
       continue;
     }
 
-    if (lang_parsers.has(config.name)) {
-      const pre = shadow.get(config.name);
+    if (lang_parsers.has(extra.name)) {
+      const pre = shadow.get(extra.name);
       console.error(pico.yellow(` - Duplicate Entry:\n\t${entry}\n\t${pre}`));
       continue;
     }
 
-    shadow.set(config.name, entry);
-    lang_parsers.set(config.name, config);
-    console.log(pico.green(` - Entry Loaded: ${config.name}`));
+    shadow.set(extra.name, entry);
+    lang_parsers.set(extra.name, config);
+    console.log(pico.green(` - Entry Loaded: ${extra.name}`));
   }
 
   console.log(pico.cyan("Finished loading."));
-  return lang_parsers;
 }
 
 /**
 * @param {String} pathFs
-* @returns {LoadEntry}
+* @returns {Promise<LoadEntry>}
 */
-function loadEntry(pathFs) {
+async function loadEntry(pathFs) {
   try {
-    /** @type {import("./language.d.ts").languageEntry} */
+    /** @type {languageEntry} */
     const entry = require(pathFs);
-    return { entry: require(entry.absolutePath), error: null };
+    const parserLanguage = await loadParserWASM(entry.absolutePath);
+
+    // @ts-ignore
+    return { entry: parserLanguage, error: null, extra: entry };
   }
   catch (err) {
-    return { entry: null, error: err };
+    return { entry: null, error: err, extra: null };
   }
 }
 
-/**
-* Retreive files recursively.
-* - ONLY handles DIRECTORY and FILE.
-* - filters file by entry filename from `providor.js`
-* @return {String[]}
-*/
-function parseFolder() {
-  const item = [__dirname];
-  const files = [];
-
-  // recursively read folder.
-  while (item.length) {
-    const element = item.pop();
-    const stat = fs.lstatSync(element);
-
-    if (stat.isDirectory()) {
-      item.unshift(
-        ...fs.readdirSync(element).map(v => path.join(element, v))
-      );
-    }
-    if (stat.isFile()) { files.push({ stat: stat, pathFs: element }); }
-  }
-
-  // filter by filename (ex. index.js);
-  const entryFiles = files.filter((file) => {
-    const filename = path.basename(file.pathFs);
-    return filename.toLowerCase() === binaryEntries.toLowerCase()
-  });
-
-  return entryFiles.map((v) => v.pathFs);
+async function loadParserWASM(pathFs) {
+  const data = new Uint8Array(fs.readFileSync(pathFs));
+  const ParserLanguage = await Language.load(data);
+  return ParserLanguage;
 }
 
-module.exports = load_parsers;
+module.exports = {
+  getParser: () => parser,
+  getLoadedParsers: () => lang_parsers,
+  load_parsers: load_parsers
+}

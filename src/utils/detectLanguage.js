@@ -1,12 +1,14 @@
-const loadAllParsers = require("../../parsers/loader.js");
-const parsers = loadAllParsers();
+const { getLoadedParsers } = require("../../parsers/loader.js");
 
 /**
 * @param {String} filePath
 * @returns
 */
 function detectLanguageByPath(filePath) {
-  if (filePath.endsWith(".js")) return parsers.get("javascript");;
+  const parsers = getLoadedParsers();
+  if (parsers === null) throw Error("Load the parsers first!");
+
+  if (filePath.endsWith(".js")) return parsers.get("javascript");
   if (filePath.endsWith(".cs")) return parsers.get("c-sharp");
   if (filePath.endsWith(".py")) return parsers.get("python");
   if (filePath.endsWith(".c")) return parsers.get("c");

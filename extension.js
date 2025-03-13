@@ -1,11 +1,13 @@
 const path = require("path");
 const vscode = require('vscode');
 
-const { parseCodeBase } = require("./src/components/codebaseParser");
+// const { parseCodeBase } = require("./src/components/codebaseParser");
 const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDocument');
 
 const { parseCode, syntaxTreeToJson } = require('./src/utils/codeParser');
 const { generateCCDiagram } = require('./src/components/diagramGenerator');
+
+const { load_parsers } = require("./parsers/loader.js");
 
 const AIConnection = require("./src/components/aiConnection");
 const ProjectConfig = require("./src/components/ProjectConfig");
@@ -21,19 +23,13 @@ const Notify = {
 /**
  * @param {vscode.ExtensionContext} context
  */
-function activate(context) {
+async function activate(context) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with  registerCommand
   // The commandId parameter must match the command field in package.json
+  await startUp();
+
   const disposable = vscode.commands.registerCommand('codexview.run', async () => {
-    // empty for now
-    codexview.setup();
-    // access keyvault
-    KeyVault.init();
-
-    // read configs from jsonc
-    ProjectConfig.load(path.join(__dirname, "./config.jsonc"));
-
     const selectedFile = await fetchFileToAnalyze();
 
     if (selectedFile.length > 0) {
@@ -54,7 +50,7 @@ function activate(context) {
 
       Notify.info('CodeXView! Processing......');
 
-      console.log("printDotGraph: ", parsedCode.printDotGraph());
+      // console.log("printDotGraph: ", parsedCode.printDotGraph());
 
       //ta ut information från parsade koden, som fil count och namn, functions count+namn
       // och samma för variabler till resultats checkning
@@ -83,25 +79,25 @@ function activate(context) {
 
   const disposable2 = vscode.commands.registerCommand("codexview.runmultiple", async () => {
     try {
-      const folder = getWorkspaceFolder();
-      if (!folder) {
-        Notify.error("❌ No workspace folder found.");
-        return;
-      }
+      // const folder = getWorkspaceFolder();
+      // if (!folder) {
+      //   Notify.error("❌ No workspace folder found.");
+      //   return;
+      // }
 
-      Notify.info("🔍 CodeXView! Found Codebase...");
-      Notify.info("🚀 CodeXView! Started...");
+      // Notify.info("🔍 CodeXView! Found Codebase...");
+      // Notify.info("🚀 CodeXView! Started...");
 
-      const folderName = path.basename(folder);
-      const parsedCode = await parseCodeBase(folder);
+      // const folderName = path.basename(folder);
+      // const parsedCode = await parseCodeBase(folder);
 
-      if (!parsedCode) {
-        Notify.error("❌ Code parsing failed.");
-        return;
-      }
+      // if (!parsedCode) {
+      //   Notify.error("❌ Code parsing failed.");
+      //   return;
+      // }
 
-      console.log("Parsed Code:", parsedCode);
-      let diagramCode = "";
+      // console.log("Parsed Code:", parsedCode);
+      // let diagramCode = "";
 
       // await addDiagramToProject(diagramCode, folder, folderName);
 
@@ -114,6 +110,17 @@ function activate(context) {
   context.subscriptions.push(disposable, disposable2);
 }
 
+async function startUp() {
+  // empty for now
+  codexview.setup();
+  // access keyvault
+  KeyVault.init();
+
+  // read configs from jsonc
+  ProjectConfig.load(path.join(__dirname, "./config.jsonc"));
+
+  await load_parsers();
+}
 
 // This method is called when your extension is deactivated
 function deactivate() { }
