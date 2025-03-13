@@ -10,7 +10,6 @@ const { getParser } = require("../../parsers/loader.js");
 async function parseCode(filePath) {
   const parser = getParser();
   const lang = detectLanguageByPath(filePath);
-  console.log("lang", lang)
   parser.setLanguage(lang);
 
   return parser.parse(await readStream(filePath));

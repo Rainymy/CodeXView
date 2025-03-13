@@ -1,7 +1,7 @@
 const path = require("path");
 const vscode = require('vscode');
 
-// const { parseCodeBase } = require("./src/components/codebaseParser");
+const { parseCodeBase } = require("./src/components/codebaseParser");
 const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDocument');
 
 const { parseCode, syntaxTreeToJson } = require('./src/utils/codeParser');
@@ -32,30 +32,24 @@ async function activate(context) {
   const disposable = vscode.commands.registerCommand('codexview.run', async () => {
     const selectedFile = await fetchFileToAnalyze();
 
+    if (selectedFile.length === 0) {
+      Notify.error('No file selected.');
+    }
+
     if (selectedFile.length > 0) {
       Notify.info('CodeXView! Found File...');
-      // === DONT FORGET TO SET ROOT PATH!!! ===
-      // save folder will be somewhere at the narnia.
-      ProjectConfig.setRootPath(path.dirname(selectedFile));
-      // ensure_structure uses root path to verify output folder.
-      const structure = codexview.ensure_structure();
 
-      if (structure.fatal) { return Notify.error(structure.fatal); }
-      if (structure.info.length) { Notify.warning(structure.info.join("\n")); }
-
-      Notify.info('CodeXView! Started...');
+      if (!parseSetup(path.dirname(selectedFile))) {
+        return Notify.error("Problem with permission!");
+      }
 
       const parsedCode = await parseCode(selectedFile);
       const parsedJson = syntaxTreeToJson(parsedCode);
 
       Notify.info('CodeXView! Processing......');
 
-      // console.log("printDotGraph: ", parsedCode.printDotGraph());
-
       //ta ut information från parsade koden, som fil count och namn, functions count+namn
       // och samma för variabler till resultats checkning
-
-      // const AICon = await (new AIConnection()).init();
 
       const diagram = await AIConnection.getChatResponse(parsedJson);
       console.log("DiagramCode:", diagram);
@@ -72,31 +66,32 @@ async function activate(context) {
       } else {
         Notify.error('CodeXView! Error adding diagram to project...');
       }
-    } else {
-      Notify.error('No file selected.');
     }
   });
 
   const disposable2 = vscode.commands.registerCommand("codexview.runmultiple", async () => {
     try {
-      // const folder = getWorkspaceFolder();
-      // if (!folder) {
-      //   Notify.error("❌ No workspace folder found.");
-      //   return;
-      // }
+      const folder = getWorkspaceFolder();
+      if (!folder) {
+        Notify.error("❌ No workspace folder found.");
+        return;
+      }
 
-      // Notify.info("🔍 CodeXView! Found Codebase...");
-      // Notify.info("🚀 CodeXView! Started...");
+      if (!parseSetup(folder)) {
+        return Notify.error("Problem with permission!");
+      }
 
-      // const folderName = path.basename(folder);
-      // const parsedCode = await parseCodeBase(folder);
+      Notify.info("🔍 CodeXView! Found Codebase...");
 
-      // if (!parsedCode) {
-      //   Notify.error("❌ Code parsing failed.");
-      //   return;
-      // }
+      const folderName = path.basename(folder);
+      const parsedCode = await parseCodeBase(folder);
 
-      // console.log("Parsed Code:", parsedCode);
+      if (!parsedCode) {
+        Notify.error("❌ Code parsing failed.");
+        return;
+      }
+
+      console.log("Parsed Code:", parsedCode);
       // let diagramCode = "";
 
       // await addDiagramToProject(diagramCode, folder, folderName);
@@ -108,6 +103,31 @@ async function activate(context) {
   });
 
   context.subscriptions.push(disposable, disposable2);
+}
+
+/**
+* ==== DONT FORGET TO SET ROOT PATH!!! ====
+* save folder will be somewhere at the narnia.
+* @param {String} rootPathFs
+* @returns {boolean} is OK to continue?
+*/
+function parseSetup(rootPathFs) {
+  // === DONT FORGET TO SET ROOT PATH!!! ===
+  // save folder will be somewhere at the narnia.
+  ProjectConfig.setRootPath(rootPathFs);
+  // ensure_structure uses root path to verify output folder.
+  const structure = codexview.ensure_structure();
+
+  if (structure.fatal) {
+    Notify.error(structure.fatal);
+    return false;
+  }
+
+  if (structure.info.length) {
+    Notify.warning(structure.info.join("\n"));
+  }
+
+  return true;
 }
 
 async function startUp() {

@@ -1,24 +1,18 @@
-const Parser = require('tree-sitter');
-
 const fs = require('fs');
 const vscode = require('vscode');
 const path = require("path");
 
 const { detectLanguageByPath } = require('../utils/detectLanguage');
+const { getParser } = require("../../parsers/loader");
 
 // Use github linguest package to identify/analys projact.
 async function parseCodeBase(folderPath) {
-  if (!fs.existsSync(folderPath) || !fs.statSync(folderPath).isDirectory()) {
-    throw new Error("❌ Invalid folder path");
-  }
-
-  // ✅ Detect language
   const lang = detectLanguageInFolder(folderPath);
   if (!lang) return null; // Stops execution if multiple languages exist
 
   console.log(`🔍 Detected language: ${lang.name}`);
 
-  const parser = new Parser();
+  const parser = getParser();
   parser.setLanguage(lang);
 
   // ✅ Get all files recursively and exclude unnecessary folders
@@ -42,6 +36,30 @@ async function parseCodeBase(folderPath) {
   return parsedTrees;
 }
 
+function detectLanguageInFolder(folderPath) {
+  const extension = [".js", ".cs", ".py", ".c", ".java", ".cpp", ".rb"];
+  const exclude = ["node_modules", ".git", "dist", ".md", ".env"];
+
+  const files = getAllFiles(folderPath, extension, exclude);
+  const detectedLanguages = new Set();
+
+  for (const file of files) {
+    const lang = detectLanguageByPath(file);
+    if (lang) { detectedLanguages.add(lang); }
+  }
+
+  if (detectedLanguages.size === 0) {
+    vscode.window.showErrorMessage("❌ No programming files detected in the folder.");
+    return null;
+  }
+
+  if (detectedLanguages.size > 1) {
+    vscode.window.showErrorMessage("❌ Multiple programming languages found. Only one is allowed.");
+    return null;
+  }
+
+  return [...detectedLanguages][0]; // ✅ Returns the detected language
+}
 
 function getAllFiles(dirPath, extensions = [], excludeFolders = [], fileList = []) {
   const files = fs.readdirSync(dirPath);
@@ -60,28 +78,5 @@ function getAllFiles(dirPath, extensions = [], excludeFolders = [], fileList = [
 
   return fileList;
 }
-
-function detectLanguageInFolder(folderPath) {
-  const files = getAllFiles(folderPath, [".js", ".cs", ".py", ".c", ".java", ".cpp", ".rb"], ["node_modules", ".git", "dist", ".md", ".env"]);
-  const detectedLanguages = new Set();
-
-  files.forEach(file => {
-    const lang = detectLanguageByPath(file);
-    if (lang) detectedLanguages.add(lang);
-  });
-
-  if (detectedLanguages.size === 0) {
-    vscode.window.showErrorMessage("❌ No programming files detected in the folder.");
-    return null;
-  }
-
-  if (detectedLanguages.size > 1) {
-    vscode.window.showErrorMessage("❌ Multiple programming languages found. Only one is allowed.");
-    return null;
-  }
-
-  return [...detectedLanguages][0]; // ✅ Returns the detected language
-}
-
 
 module.exports = { parseCodeBase };

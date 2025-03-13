@@ -6,8 +6,8 @@ const { Parser, Language } = require("web-tree-sitter");
 const { parseFolder } = require("./provider");
 
 /**
- * @typedef {import('./language.d.ts').LoadEntry} LoadEntry
- * @typedef {import('./language.d.ts').languageEntry} languageEntry
+ * @typedef {import('./language').LoadEntry} LoadEntry
+ * @typedef {import('./language').languageEntry} languageEntry
  */
 
 /** @type {Parser} */
