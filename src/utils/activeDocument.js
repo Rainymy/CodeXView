@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 
+// TODO: refactor vscode show message as return value;
 function getActiveDocumentFile() {
   const activeEditor = vscode.window.activeTextEditor;
   if (!activeEditor) {

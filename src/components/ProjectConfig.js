@@ -15,7 +15,7 @@ function ProjectConfig() {
   this.getOutputParentFolder = () => path.basename(rootPath);
 
   /** @param {String} rootPathFs */
-  this.setRootPath = (rootPathFs) => rootPath = rootPathFs;
+  this.setRootPath = (rootPathFs) => { rootPath = rootPathFs; }
 
   /**
   * @param {String} configPathFs

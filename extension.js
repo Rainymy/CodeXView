@@ -9,7 +9,7 @@ const { generateCCDiagram } = require('./src/components/diagramGenerator');
 
 const { load_parsers } = require("./parsers/loader.js");
 
-const AIConnection = require("./src/components/aiConnection");
+const AIConnection = require("./src/components/AIConnection");
 const ProjectConfig = require("./src/components/ProjectConfig");
 const { KeyVault } = require("./src/components/Keyvault");
 const codexview = require("./src/components/setup");
@@ -83,7 +83,7 @@ async function activate(context) {
 
       Notify.info("🔍 CodeXView! Found Codebase...");
 
-      const folderName = path.basename(folder);
+      // const folderName = path.basename(folder);
       const parsedCode = await parseCodeBase(folder);
 
       if (!parsedCode) {
