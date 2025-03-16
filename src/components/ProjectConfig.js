@@ -54,13 +54,24 @@ function ProjectConfig() {
     if (!inputConfig) return "Invalid Configuration.";
     if (!inputConfig.saveFolder) return "Invalid save folder.";
 
-    const canCreateFolder = typeof inputConfig.canCreateFolder === "boolean";
-    const canCreateFile = typeof inputConfig.canCreateFile === "boolean";
+    const loadIgnoreRulesFromRoot = isBoolean(inputConfig.LOAD_IGNORE_RULES_FROM_ROOT);
+    const canCreateFolder = isBoolean(inputConfig.canCreateFolder);
+    const canCreateFile = isBoolean(inputConfig.canCreateFile);
+
+    if (!loadIgnoreRulesFromRoot) {
+      return "Invalid LOAD_IGNORE_RULES_FROM_ROOT value in config."
+    }
 
     if (!canCreateFolder || !canCreateFile) {
       return "Invalid permission in config.";
     }
   }
+
+  /**
+  * @param {any} type
+  * @returns {Boolean}
+  */
+  function isBoolean(type) { return typeof type === "boolean"; }
 }
 
 module.exports = new ProjectConfig();
