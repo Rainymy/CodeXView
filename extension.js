@@ -2,10 +2,11 @@ const path = require("path");
 const vscode = require('vscode');
 
 const { parseCodeBase } = require("./src/components/codebaseParser");
-const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDocument');
-
-const { parseCode, syntaxTreeToJson } = require('./src/utils/codeParser');
 const { generateCCDiagram } = require('./src/components/diagramGenerator');
+
+const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDocument');
+const { loadIgnoreRules } = require("./src/utils/ignoreRules");
+const { parseCode, syntaxTreeToJson } = require('./src/utils/codeParser');
 
 const { load_parsers } = require("./parsers/loader.js");
 
@@ -106,8 +107,7 @@ async function activate(context) {
 }
 
 /**
-* ==== DONT FORGET TO SET ROOT PATH!!! ====
-* save folder will be somewhere at the narnia.
+* this function for everytime extension runs.
 * @param {String} rootPathFs
 * @returns {boolean} is OK to continue?
 */
@@ -127,12 +127,15 @@ function parseSetup(rootPathFs) {
     Notify.warning(structure.info.join("\n"));
   }
 
+  loadIgnoreRules();
+
   return true;
 }
 
+/**
+* this function runs once.
+*/
 async function startUp() {
-  // empty for now
-  codexview.setup();
   // access keyvault
   KeyVault.init();
 

@@ -1,10 +1,6 @@
 const { ensureFolderSync } = require("../utils/fileHandler");
 const ProjectConfig = require("./ProjectConfig");
 
-function setup() {
-  return;
-}
-
 function ensure_structure() {
   const messages = [];
   // check permission - is file / folder creation allowed?
@@ -22,4 +18,4 @@ function ensure_structure() {
   return { info: messages, fatal: null }
 }
 
-module.exports = { setup, ensure_structure };
+module.exports = { ensure_structure };

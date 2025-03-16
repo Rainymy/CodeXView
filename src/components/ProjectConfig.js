@@ -4,13 +4,19 @@ const { readJSONFileSync } = require("../utils/fileHandler");
 
 function ProjectConfig() {
   let config = null;
+  /** @type {String} */
   let saveFolder = null;
+  /** @type {Boolean} */
   let createFolder = null;
+  /** @type {Boolean} */
   let createFile = null;
+  /** @type {Boolean} */
+  let readRootIgnoreRules = null;
   let rootPath = "";
 
   this.canCreateFolder = () => saveFolder && createFolder;
   this.canCreateFile = () => saveFolder && createFile;
+  this.readRootIgnoreRules = () => readRootIgnoreRules;
   this.getOutputFolder = () => path.join(rootPath, saveFolder);
   this.getRootFolder = () => {
     if (rootPath === "") {
@@ -37,6 +43,7 @@ function ProjectConfig() {
     saveFolder = config?.saveFolder;
     createFolder = config?.canCreateFolder ?? false;
     createFile = config?.canCreateFile ?? false;
+    readRootIgnoreRules = config?.LOAD_IGNORE_RULES_FROM_ROOT ?? true;
   }
 
   /**

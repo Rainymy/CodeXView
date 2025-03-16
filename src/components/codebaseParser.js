@@ -5,8 +5,14 @@ const path = require("path");
 const { detectLanguageByPath } = require('../utils/detectLanguage');
 const { getParser } = require("../../parsers/loader");
 
+const { loadAllFoldersWithIgnore } = require("../utils/ignoreRules");
+
 // Use github linguest package to identify/analys projact.
 async function parseCodeBase(folderPath) {
+
+  const validFiles = loadAllFoldersWithIgnore();
+  console.log(validFiles);
+
   const lang = detectLanguageInFolder(folderPath);
   if (!lang) return null; // Stops execution if multiple languages exist
 
@@ -32,6 +38,8 @@ async function parseCodeBase(folderPath) {
     file,
     tree: parser.parse(fs.readFileSync(file, "utf8"))
   }));
+
+  console.log(parsedTrees);
 
   return parsedTrees;
 }

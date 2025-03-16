@@ -8,8 +8,7 @@ const ProjectConfig = require("../components/ProjectConfig");
 const { printFancyMultilineTitle } = require("./fancyTitle");
 
 const IGNORE_RULES_FILE = ".gitignore";
-const DEFAULT_ADDITIONAL_RULES = [".git"];
-// ["node_modules", ".git", "dist", ".md", ".env"]
+const DEFAULT_ADDITIONAL_RULES = [".git", "dist", IGNORE_RULES_FILE, ".env"];
 
 const COULD_NOT_FIND_IGNORE_RULES = [
   pico.yellow(" COULD NOT FIND IGNORE RULES!! "),
@@ -19,7 +18,12 @@ const COULD_NOT_FIND_IGNORE_RULES = [
 /** @type {ignore.Ignore} */
 let rules = null;
 
-function loadGitIgnore() {
+function loadIgnoreRules() {
+  if (!ProjectConfig.readRootIgnoreRules()) {
+    rules = createIgnoreRules([]);
+    return;
+  }
+
   const root = ProjectConfig.getRootFolder();
   const ignoreFileRules = path.join(root, IGNORE_RULES_FILE);
 
@@ -53,7 +57,7 @@ function createIgnoreRules(baseRules) {
 */
 function isIgnored(rootFs, filePath) {
   if (rules === null) {
-    throw Error("Initialize the rules first. `loadGitIgnore()`");
+    throw Error("Initialize the rules first. `loadIgnoreRules()`");
   }
 
   const relativePath = path.relative(rootFs, filePath);
@@ -98,9 +102,10 @@ function loadAllFoldersWithIgnore() {
 
 // loadGitIgnore(); // load ignore rules via root path.
 
-const folders = loadAllFoldersWithIgnore(); // all not ignored files.
+// const folders = loadAllFoldersWithIgnore(); // all not ignored files.
 // console.log(folders);
 
 module.exports = {
-  loadAllFoldersWithIgnore: loadAllFoldersWithIgnore
+  loadAllFoldersWithIgnore: loadAllFoldersWithIgnore,
+  loadIgnoreRules: loadIgnoreRules
 }
