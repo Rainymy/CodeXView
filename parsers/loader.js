@@ -42,7 +42,7 @@ async function load_parsers() {
 
     shadow.set(extra.name, entry);
     lang_parsers.set(extra.name, config);
-    console.log(pico.green(` - Entry Loaded: ${extra.name}`));
+    console.log(pico.green(` - Entry Loaded: ${pico.cyan(extra.name)}`));
   }
 
   console.log(pico.cyan("Finished loading."));

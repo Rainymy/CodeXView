@@ -101,7 +101,7 @@ function loadAllFoldersWithIgnore(logIgnored = true) {
       );
     }
     if (stat.isFile()) {
-      files.push(currentWalk);
+      files.push(absoluteWalk);
     }
   }
 
