@@ -5,14 +5,22 @@ const ignore = require("ignore");
 const pico = require("picocolors");
 
 const ProjectConfig = require("../components/ProjectConfig");
-const { printFancyMultilineTitle } = require("./fancyTitle");
+const { printFancyMultilineTitle, printFancyTitle } = require("./fancyTitle");
 
 const IGNORE_RULES_FILE = ".gitignore";
-const DEFAULT_ADDITIONAL_RULES = [".git", "dist", IGNORE_RULES_FILE, ".env"];
+const DEFAULT_ADDITIONAL_RULES = [
+  // additional rules to ignore.
+  ".git",   // git repo
+  "dist",   // build folder
+  "*.env",  // all environment files.
+  "*.md",   // all markdown files.
+  ".*",     // ALL dot files and folder.
+  "LICENSE" // ignore all LICENSEs
+];
 
 const COULD_NOT_FIND_IGNORE_RULES = [
-  pico.yellow(" COULD NOT FIND IGNORE RULES!! "),
-  ` MISSING FILE: ${pico.red(IGNORE_RULES_FILE)} `
+  pico.yellow("COULD NOT FIND IGNORE RULES!!"),
+  `MISSING FILE: ${pico.red(IGNORE_RULES_FILE)}`
 ];
 
 /** @type {ignore.Ignore} */
@@ -20,6 +28,7 @@ let rules = null;
 
 function loadIgnoreRules() {
   if (!ProjectConfig.readRootIgnoreRules()) {
+    printFancyTitle(pico.yellow("READING RULEs FROM ROOT IS DISABLED."));
     rules = createIgnoreRules([]);
     return;
   }
@@ -60,17 +69,20 @@ function isIgnored(rootFs, filePath) {
     throw Error("Initialize the rules first. `loadIgnoreRules()`");
   }
 
-  const relativePath = path.relative(rootFs, filePath);
-  const isMatch = rules.ignores(relativePath);
-
-  // console.log(`Checking: ${relativePath} => Ignored:`, isMatch);
-  return isMatch;
+  return rules.ignores(path.relative(rootFs, filePath));
 }
 
-function loadAllFoldersWithIgnore() {
+/**
+*
+* @param {Boolean} logIgnored write to terminal ignored files/folders.
+* @returns
+*/
+function loadAllFoldersWithIgnore(logIgnored = true) {
   const root = ProjectConfig.getRootFolder();
   const item = [...fs.readdirSync(root)];
   const files = [];
+
+  console.log("Root: ", pico.blue(root));
 
   // walk throught folder structures => FIFO.
   while (item.length) {
@@ -78,7 +90,7 @@ function loadAllFoldersWithIgnore() {
     const absoluteWalk = path.join(root, currentWalk);
 
     if (isIgnored(root, absoluteWalk)) {
-      console.log("Ignoring: ", absoluteWalk);
+      if (logIgnored) console.log("Ignoring: ", pico.yellow(currentWalk));
       continue;
     }
 
