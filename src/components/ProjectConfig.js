@@ -12,7 +12,12 @@ function ProjectConfig() {
   this.canCreateFolder = () => saveFolder && createFolder;
   this.canCreateFile = () => saveFolder && createFile;
   this.getOutputFolder = () => path.join(rootPath, saveFolder);
-  this.getOutputParentFolder = () => path.basename(rootPath);
+  this.getRootFolder = () => {
+    if (rootPath === "") {
+      throw Error("Initialize the root folder first!");
+    }
+    return rootPath;
+  };
 
   /** @param {String} rootPathFs */
   this.setRootPath = (rootPathFs) => { rootPath = rootPathFs; }

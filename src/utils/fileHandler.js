@@ -1,5 +1,6 @@
 const fs = require('fs');
 const jsonc = require("jsonc-parser");
+const path = require("path");
 
 /**
 * @param {String} filePathFs
@@ -16,6 +17,21 @@ function readJSONFileSync(filePathFs) {
 */
 function readdirSync(filePath) {
   return fs.readdirSync(filePath);
+}
+
+/**
+* @param {String} filePath
+* @returns
+*/
+function readdir(filePath) {
+  return new Promise((resolve, reject) => {
+    fs.readdir(filePath, { recursive: true }, (error, data) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(data);
+    })
+  });
 }
 
 /**
@@ -97,6 +113,7 @@ function customWriteStream(filePathFs, data) {
 
 module.exports = {
   readJSONFileSync: readJSONFileSync,
+  readdir: readdir,
   readdirSync: readdirSync,
   ensureFolderSync: ensureFolderSync,
   writeJSONFileSync: customWriteJSONFileSync,
