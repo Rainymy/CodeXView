@@ -19,7 +19,7 @@ const BUILD_TARGET = {
   [BUILD_PLATFROM.MAC]: [BUILD_ARCH.X64, BUILD_ARCH.ARM64],
 }
 
-printFancyTitle(" Compiler Script. ");
+printFancyTitle("Compiler Script.");
 child_process.execSync("npm install", { stdio: "inherit" });
 child_process.execSync("npm audit fix", { stdio: "inherit" });
 
@@ -31,7 +31,7 @@ for (const platform of Object.keys(BUILD_TARGET)) {
     child_process.execSync(script, { stdio: "inherit" });
   }
 }
-printFancyTitle(" Successfully compiled. ");
+printFancyTitle("Successfully compiled.");
 
 
 // =================== UTILS ===================

@@ -14,7 +14,7 @@ const ROOT_PARSER = __dirname;
 * @return {String[]}
 */
 function parseFolder() {
-  printFancyTitle(" Getting Loaders Ready ");
+  printFancyTitle("Getting Loaders Ready");
   const item = [ROOT_PARSER];
   const files = [];
 

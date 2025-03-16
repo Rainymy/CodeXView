@@ -48,7 +48,7 @@ function printFancyMultilineTitle(
 ) {
   console.log(symbol.repeat(width));
   for (const title of titles) {
-    console.log(centerText(title, width));
+    console.log(centerText(` ${title} `, width));
   }
   console.log(symbol.repeat(width));
 }
