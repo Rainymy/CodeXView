@@ -2,23 +2,23 @@ export interface Heuristics {
   disambiguations?: (DisambiguationsEntity)[] | null;
   named_patterns: NamedPatterns;
 }
-interface DisambiguationsEntity {
+export interface DisambiguationsEntity {
   extensions?: (string)[] | null;
   rules?: (RulesEntity)[] | null;
 }
-interface RulesEntity {
+export interface RulesEntity {
   language?: string | (string)[] | null;
   and?: (AndEntity)[] | null;
-  pattern?: string | null | (string)[] | null | string | (string)[] | null | string | (string)[] | null | string | (string)[] | null | (string)[] | null | string;
+  pattern?: string | null | (string)[];
   named_pattern?: string | null;
   negative_pattern?: string | null | (string)[] | null;
 }
-interface AndEntity {
+export interface AndEntity {
   named_pattern?: string | null;
   pattern?: string | null;
   negative_pattern?: string | null;
 }
-interface NamedPatterns {
+export interface NamedPatterns {
   cpp?: (string)[] | null;
   euphoria?: (string)[] | null;
   fortran: string;

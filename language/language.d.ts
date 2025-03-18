@@ -1,6 +1,6 @@
 export declare const LinguistLanguages: Record<string, Language>;
 
-interface Language {
+export interface Language {
   name: string
   type: string
   color?: string
