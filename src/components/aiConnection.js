@@ -1,16 +1,28 @@
+const { readCCDExample} = require("../utils/fileHandler");
+
 class AIConnection {
   constructor() {
     this.apiUrl = "";
+    this.apiKey = "";
   }
 
   async getChatResponse(parsedCode) {
+    const cccExample = readCCDExample();
     try {
+      //const response = await fetch('this.apiUrl ', {
       const response = await fetch('localhost:5191/o1Chat', {
+     
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'ApiKey': this.apiKey
         },
-        body: JSON.stringify({ userMessage: parsedCode })
+        body: JSON.stringify({
+          //deploymentName: "",
+          //systemPrompt: "", 
+          cccExample: cccExample,  
+          diagramCode: parsedCode
+        })
       });
 
       if (!response.ok) {

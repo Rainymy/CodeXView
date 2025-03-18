@@ -11,7 +11,7 @@ const { load_parsers } = require("./parsers/loader.js");
 
 const AIConnection = require("./src/components/aiConnection");
 const ProjectConfig = require("./src/components/ProjectConfig");
-const { KeyVault } = require("./src/components/Keyvault");
+const { KeyVault, SECRET_ENUM } = require("./src/components/Keyvault");
 const codexview = require("./src/components/setup");
 
 const Notify = {
@@ -135,6 +135,8 @@ async function startUp() {
   codexview.setup();
   // access keyvault
   KeyVault.init();
+  AIConnection.apiKey = await KeyVault.getSecret(SECRET_ENUM.KEY);
+  AIConnection.apiUrl = await KeyVault.getSecret(SECRET_ENUM.URL);
 
   // read configs from jsonc
   ProjectConfig.load(path.join(__dirname, "./config.jsonc"));

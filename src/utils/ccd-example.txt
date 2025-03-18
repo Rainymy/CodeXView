@@ -1,0 +1,21 @@
+@startuml
+left to right direction
+skinparam linetype ortho
+
+skinparam nodesep 40
+skinparam ranksep 250
+rectangle "User\n----\n+ Id : int\n+ Name : string\n+ Email : string\n+ State : UserState" as User
+rectangle "UserState\n----\n+ Activate() : UserState\n+ Suspend() : UserState\n+ Reactivate() : UserState" as UserState
+rectangle "InactiveState" as InactiveState
+rectangle "ActiveState" as ActiveState
+rectangle "SuspendedState" as SuspendedState
+
+User --> UserState : "State Changes"
+UserState <|-- InactiveState: "Activate"
+UserState <|-- ActiveState : "Suspend"
+UserState <|-- SuspendedState : "Reactivate"
+
+' Hidden links to keep the three states in a row
+InactiveState -[hidden]-> ActiveState
+ActiveState -[hidden]-> SuspendedState
+@enduml
