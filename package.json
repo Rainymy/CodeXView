@@ -1,7 +1,7 @@
 {
   "name": "codexview",
   "displayName": "CodeXView",
-  "description": "",
+  "description": "Tool for visualizing code interactions and architecture.",
   "version": "0.0.1",
   "private": true,
   "engines": {
@@ -10,6 +10,10 @@
   "categories": [
     "Other"
   ],
+  "icon": "./assets/icon_128x128.png",
+  "galleryBanner": {
+    "color": "#1F6790"
+  },
   "activationEvents": [],
   "main": "./extension.js",
   "contributes": {
@@ -29,6 +33,14 @@
     "pretest": "npm run lint",
     "test": "vscode-test"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Axmus30/CodeXView.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Axmus30/CodeXView/issues"
+  },
+  "license": "UNLICENSED",
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
