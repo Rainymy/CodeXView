@@ -66,7 +66,8 @@ You can author your README using Visual Studio Code.  Here are some useful edito
 
 ## License
 
-All prebuilt binaries included in this project (located in the `prebuilds/` folder) are distributed under the MIT License. The full license text is available in the [`LICENSE`](./prebuild/win32-x64/LICENSE) file.
+All prebuilt binaries included in this project (located in the `parsers/<language>` folder) are distributed under the MIT License.
+The corresponding license text can be found in the `./parsers/<language>/LICENSE` file.
 
 By using this software, you agree to the terms of the MIT License.
 
