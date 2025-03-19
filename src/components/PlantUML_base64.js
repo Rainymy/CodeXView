@@ -1,4 +1,4 @@
-const pako = require("pako");
+const zlib = require("zlib");
 
 /**
 * @param {Number} c
@@ -39,13 +39,10 @@ function append3bytes(b1, b2, b3) {
 * @returns {String}
 */
 function encodePlantUML(umlCode) {
-  // 1) UTF-8 bytes
-  const utf8 = Buffer.from(umlCode, 'utf-8');
+  const buffer = Buffer.from(umlCode, 'utf-8');
+  const compressed = Uint8Array.from(zlib.deflateRawSync(buffer));
 
-  // 2) Deflate (no zlib headers)
-  const compressed = pako.deflateRaw(utf8);
-
-  // 3) Custom Base64
+  // PlantUML uses custom Base64.
   let encoded = '';
   for (let i = 0; i < compressed.length; i += 3) {
     if (i + 2 === compressed.length) {
