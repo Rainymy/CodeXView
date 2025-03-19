@@ -1,14 +1,25 @@
 const fs = require('fs');
 const jsonc = require("jsonc-parser");
-const path = require("path");
 
 /**
 * @param {String} filePathFs
 * @returns {object}
 */
 function readJSONFileSync(filePathFs) {
-  const data = fs.readFileSync(filePathFs, { encoding: "utf8" });
-  return jsonc.parse(data);
+  return jsonc.parse(fs.readFileSync(filePathFs, "utf8"));
+}
+
+/**
+* @param {String} filePathFs
+* @param {BufferEncoding=} encoding
+* @returns
+*/
+function readFileSync(filePathFs, encoding) {
+  return fs.readFileSync(filePathFs, encoding);
+}
+
+function existsSync(filePathFs) {
+  return fs.existsSync(filePathFs);
 }
 
 /**
@@ -112,12 +123,13 @@ function customWriteStream(filePathFs, data) {
 }
 
 function readCCDExample() {
-  const data = fs.readFileSync("ccd-example.txt", { encoding: "utf8" });
-  return data
+  return fs.readFileSync("ccd-example.txt", "utf8");
 }
 
 module.exports = {
   readJSONFileSync: readJSONFileSync,
+  readFileSync: readFileSync,
+  existsSync: existsSync,
   readdir: readdir,
   readdirSync: readdirSync,
   ensureFolderSync: ensureFolderSync,

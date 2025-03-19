@@ -1,9 +1,8 @@
-const { getLoadedParsers } = require("../../parsers/loader.js");
-const { heuristics, languages } = require("../../language/provider");
+const { languages } = require("../../language/provider");
 const { disambiguations } = require("./disambiguations");
 
 const path = require("path");
-const fs = require("fs");
+const { existsSync } = require("./fileHandler");
 
 /**
 * @typedef {object} DetectLanguage
@@ -24,7 +23,7 @@ const fs = require("fs");
 * @returns {DetectLanguage}
 */
 function detectLanguageByPath(filePath) {
-  if (!fs.existsSync(filePath)) {
+  if (!existsSync(filePath)) {
     return detectedLanguage(null, filePath, "File does not exist.");
   }
 
@@ -49,6 +48,7 @@ function detectedLanguage(lang, path, error) {
 }
 
 /**
+* This operation is expensive, use only when need to.
 * @param {String} filePath
 * @returns {String=}
 */
@@ -92,9 +92,7 @@ function filterByProgrammingLanguage(langs) {
 */
 function languagesSimpleStat(langs) {
   /** @type {String[]} */
-  const uniqueLanguages = [
-    ...new Set(structuredClone(langs).map(d => d.language))
-  ];
+  const uniqueLanguages = [...new Set(langs.map(d => d.language))];
 
   return {
     languages: uniqueLanguages,
@@ -112,21 +110,32 @@ function filterByLanguage(langs, lng) {
   return langs.filter(val => val.language === lng);
 }
 
-// function old() {
-//   const parsers = getLoadedParsers();
-//   if (parsers === undefined) throw Error("Load the parsers first!");
+/**
+* @param {String[]} files
+* @returns
+*/
+function detectLanguagesInFiles(files) {
+  const detectedLanguages = [];
+  const failedLanguages = [];
 
-//   if (filePath.endsWith(".js")) return parsers.get("javascript");
-//   if (filePath.endsWith(".cs")) return parsers.get("c-sharp");
-//   if (filePath.endsWith(".py")) return parsers.get("python");
-//   if (filePath.endsWith(".c")) return parsers.get("c");
-//   if (filePath.endsWith(".java")) return parsers.get("java");
-//   if (filePath.endsWith(".cpp")) return parsers.get("cpp");
-//   if (filePath.endsWith(".rb")) return parsers.get("ruby");
-// }
+  for (const file of files) {
+    const detected = detectLanguageByPath(file);
+    if (detected.error) {
+      failedLanguages.push(detected);
+      continue;
+    }
+    detectedLanguages.push(detected);
+  }
+
+  return {
+    detected: detectedLanguages,
+    failed: failedLanguages
+  }
+}
 
 module.exports = {
   detectLanguageByPath: detectLanguageByPath,
+  detectLanguagesInFiles: detectLanguagesInFiles,
   filterByProgrammingLanguage: filterByProgrammingLanguage,
   filterByLanguage: filterByLanguage,
   languagesSimpleStat: languagesSimpleStat

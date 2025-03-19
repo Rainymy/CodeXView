@@ -1,18 +1,31 @@
-const { customReadStream: readStream } = require("./fileHandler");
+const { readFileSync } = require("./fileHandler");
 const { detectLanguageByPath } = require("./detectLanguage");
 
-const { getParser } = require("../../parsers/loader.js");
+const { getParser, getLanguageParser } = require("../../parsers/loader.js");
 
 /**
 * @param {String} filePath
 * @returns
 */
-async function parseCode(filePath) {
-  const parser = getParser();
-  const lang = detectLanguageByPath(filePath);
-  parser.setLanguage(lang);
+function analyzeCode(filePath) {
+  const { language, error, path } = detectLanguageByPath(filePath);
 
-  return parser.parse(await readStream(filePath));
+  if (error) {
+    console.log("❌ Found No Programming Languages!");
+    return;
+  }
+
+  const languageParser = getLanguageParser(language);
+
+  if (!languageParser) {
+    console.warn(`⚠️  No parser available for language: ${language}`);
+    return;
+  }
+
+  const parser = getParser();
+  parser.setLanguage(languageParser);
+
+  return parser.parse(readFileSync(path, "utf8"));
 }
 
 function syntaxTreeToJson(tree) {
@@ -32,4 +45,8 @@ function syntaxNodeToJson(node) {
     children: node.children.map(syntaxNodeToJson) // Recursively process children
   };
 }
-module.exports = { parseCode, syntaxTreeToJson };
+
+module.exports = {
+  analyzeCode: analyzeCode,
+  syntaxTreeToJson: syntaxTreeToJson
+};

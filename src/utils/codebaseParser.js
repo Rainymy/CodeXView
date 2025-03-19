@@ -1,24 +1,14 @@
-const ProjectConfig = require('../components/ProjectConfig');
-
-const path = require("path");
-const fs = require("fs");
+const { readFileSync } = require("./fileHandler")
 
 const {
-  detectLanguageByPath,
   filterByProgrammingLanguage,
   filterByLanguage,
-  languagesSimpleStat
+  languagesSimpleStat,
+  detectLanguagesInFiles
 } = require('../utils/detectLanguage');
-const {
-  getParser,
-  load_parsers,
-  getLanguageParser
-} = require("../../parsers/loader");
+const { loadAllFoldersWithIgnore } = require("../utils/ignoreRules");
 
-const {
-  loadAllFoldersWithIgnore,
-  loadIgnoreRules
-} = require("../utils/ignoreRules");
+const { getParser, getLanguageParser } = require("../../parsers/loader");
 
 /**
 * @typedef {import("./detectLanguage").DetectLanguage} DetectLanguage
@@ -31,7 +21,7 @@ const {
 */
 
 // Use github linguest package to identify/analys projact.
-async function parseCodeBase() {
+async function analyzeCodebase() {
   const allFiles = loadAllFoldersWithIgnore(false);
 
   const detectedData = detectLanguagesInFiles(allFiles);
@@ -83,43 +73,11 @@ function parseFilesForLanguage(sourceFiles, language) {
   return filesByLanguage.map(file => {
     return {
       file: file.path,
-      tree: parser.parse(fs.readFileSync(file.path, "utf8"))
+      tree: parser.parse(readFileSync(file.path, "utf8"))
     };
   })
 }
 
-/**
-* @param {String[]} files
-* @returns
-*/
-function detectLanguagesInFiles(files) {
-  const detectedLanguages = [];
-  const failedLanguages = [];
-
-  for (const file of files) {
-    const detected = detectLanguageByPath(file);
-    if (detected.error) {
-      failedLanguages.push(detected);
-      continue;
-    }
-    detectedLanguages.push(detected);
-  }
-
-  return {
-    detected: detectedLanguages,
-    failed: failedLanguages
-  }
-}
-
-// (async () => {
-//   await load_parsers();
-
-//   const rootPath = path.join(__dirname, "../../");
-//   ProjectConfig.load(path.join(rootPath, "config.jsonc"));
-//   ProjectConfig.setRootPath(rootPath);
-
-//   loadIgnoreRules(); // load ignore rules via root path.
-//   parseCodeBase();
-// })()
-
-module.exports = { parseCodeBase };
+module.exports = {
+  analyzeCodebase: analyzeCodebase
+};

@@ -1,8 +1,6 @@
-const path = require("path");
-const fs = require("fs");
+const { readFileSync } = require("./fileHandler");
 
-const { getLoadedParsers } = require("../../parsers/loader.js");
-const { heuristics, languages } = require("../../language/provider");
+const { heuristics } = require("../../language/provider");
 
 /**
 * @typedef {import("../../language/heuristics.js").RulesEntity} RulesEntity
@@ -16,7 +14,7 @@ const { heuristics, languages } = require("../../language/provider");
 * @returns
 */
 function disambiguations(ext, filePath) {
-  const fileContent = fs.readFileSync(filePath, "utf8");
+  const fileContent = readFileSync(filePath, "utf8");
 
   for (const disambiguation of heuristics.disambiguations) {
     if (!disambiguation.extensions.includes(ext)) { continue; }
