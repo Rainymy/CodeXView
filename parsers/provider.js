@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 
-const { printFancyTitle } = require("./util");
+const { printFancyTitle } = require("../src/utils/fancyTitle");
 
 const BINARY_ENTRY = "entry.js";
 const ROOT_PARSER = __dirname;
@@ -14,7 +14,7 @@ const ROOT_PARSER = __dirname;
 * @return {String[]}
 */
 function parseFolder() {
-  printFancyTitle(" Getting Loaders Ready ");
+  printFancyTitle("Getting Loaders Ready");
   const item = [ROOT_PARSER];
   const files = [];
 

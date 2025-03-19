@@ -1,4 +1,4 @@
-const path = require('node:path');
+const path = require('path');
 const axios = require("axios");
 
 const { customWriteStream, readdirSync } = require("../utils/fileHandler");
@@ -34,7 +34,7 @@ async function generateCCDiagram(diagramCode) {
 
 function getNextFileName() {
   const outputFolder = ProjectConfig.getOutputFolder();
-  const projectName = ProjectConfig.getOutputParentFolder();
+  const projectName = path.basename(ProjectConfig.getRootFolder());
 
   const pngFiles = readdirSync(outputFolder).filter(file => file.endsWith(".png"));
 

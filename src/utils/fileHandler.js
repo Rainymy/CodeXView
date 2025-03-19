@@ -1,5 +1,6 @@
-"use strict";
 const fs = require('fs');
+const path = require('path');
+
 const jsonc = require("jsonc-parser");
 
 /**
@@ -7,8 +8,20 @@ const jsonc = require("jsonc-parser");
 * @returns {object}
 */
 function readJSONFileSync(filePathFs) {
-  const data = fs.readFileSync(filePathFs, { encoding: "utf8" });
-  return jsonc.parse(data);
+  return jsonc.parse(fs.readFileSync(filePathFs, "utf8"));
+}
+
+/**
+* @param {String} filePathFs
+* @param {BufferEncoding=} encoding
+* @returns
+*/
+function readFileSync(filePathFs, encoding) {
+  return fs.readFileSync(filePathFs, encoding);
+}
+
+function existsSync(filePathFs) {
+  return fs.existsSync(filePathFs);
 }
 
 /**
@@ -17,6 +30,21 @@ function readJSONFileSync(filePathFs) {
 */
 function readdirSync(filePath) {
   return fs.readdirSync(filePath);
+}
+
+/**
+* @param {String} filePath
+* @returns
+*/
+function readdir(filePath) {
+  return new Promise((resolve, reject) => {
+    fs.readdir(filePath, { recursive: true }, (error, data) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(data);
+    })
+  });
 }
 
 /**
@@ -97,12 +125,15 @@ function customWriteStream(filePathFs, data) {
 }
 
 function readCCDExample() {
-  const data = fs.readFileSync("ccd-example.txt", { encoding: "utf8" });
-  return data
+  const ccd_example_txt = path.join(__dirname, "ccd-example.txt");
+  return fs.readFileSync(ccd_example_txt, "utf8");
 }
 
 module.exports = {
   readJSONFileSync: readJSONFileSync,
+  readFileSync: readFileSync,
+  existsSync: existsSync,
+  readdir: readdir,
   readdirSync: readdirSync,
   ensureFolderSync: ensureFolderSync,
   writeJSONFileSync: customWriteJSONFileSync,

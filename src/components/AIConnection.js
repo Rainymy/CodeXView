@@ -1,4 +1,4 @@
-const { readCCDExample} = require("../utils/fileHandler");
+const { readCCDExample } = require("../utils/fileHandler");
 
 class AIConnection {
   constructor() {
@@ -11,7 +11,7 @@ class AIConnection {
     try {
       //const response = await fetch('this.apiUrl ', {
       const response = await fetch('localhost:5191/o1Chat', {
-     
+
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -19,14 +19,14 @@ class AIConnection {
         },
         body: JSON.stringify({
           //deploymentName: "",
-          //systemPrompt: "", 
-          cccExample: cccExample,  
+          //systemPrompt: "",
+          cccExample: cccExample,
           diagramCode: parsedCode
         })
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
+        throw new Error(`Network response was not ok: ${response.statusText}`);
       }
 
       return await response.text();
@@ -60,5 +60,4 @@ class AIConnection {
 //   }
 // }
 
-const AIConnectionInstance = new AIConnection();
-module.exports = AIConnectionInstance;
+module.exports = new AIConnection();

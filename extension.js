@@ -1,15 +1,16 @@
 const path = require("path");
 const vscode = require('vscode');
 
-const { parseCodeBase } = require("./src/components/codebaseParser");
-const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDocument');
-
-const { parseCode, syntaxTreeToJson } = require('./src/utils/codeParser');
+const { analyzeCodebase } = require("./src/utils/codebaseParser");
 const { generateCCDiagram } = require('./src/components/diagramGenerator');
+
+const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDocument');
+const { loadIgnoreRules } = require("./src/utils/ignoreRules");
+const { analyzeCode, syntaxTreeToJson } = require('./src/utils/codeParser');
 
 const { load_parsers } = require("./parsers/loader.js");
 
-const AIConnection = require("./src/components/aiConnection");
+const AIConnection = require("./src/components/AIConnection");
 const ProjectConfig = require("./src/components/ProjectConfig");
 const { KeyVault, SECRET_ENUM } = require("./src/components/Keyvault");
 const codexview = require("./src/components/setup");
@@ -40,16 +41,18 @@ async function activate(context) {
       Notify.info('CodeXView! Found File...');
 
       if (!parseSetup(path.dirname(selectedFile))) {
-        return Notify.error("Problem with permission!");
+        return Notify.error("⚠️ Problem with permission!");
       }
 
-      const parsedCode = await parseCode(selectedFile);
+      const parsedCode = analyzeCode(selectedFile);
       const parsedJson = syntaxTreeToJson(parsedCode);
 
       Notify.info('CodeXView! Processing......');
 
-      //ta ut information från parsade koden, som fil count och namn, functions count+namn
-      // och samma för variabler till resultats checkning
+      console.log("parsedJson: ", parsedJson);
+
+      // Get information from the parsed code, such as file count and names,
+      // function count and names, and the same for variables, to check results.
 
       const diagram = await AIConnection.getChatResponse(parsedJson);
       console.log("DiagramCode:", diagram);
@@ -70,21 +73,22 @@ async function activate(context) {
   });
 
   const disposable2 = vscode.commands.registerCommand("codexview.runmultiple", async () => {
+    const folder = getWorkspaceFolder();
+    if (!folder) {
+      Notify.error("❌ No workspace folder found.");
+      return;
+    }
+
+    if (!parseSetup(folder)) {
+      return Notify.error("⚠️ Problem with permission!");
+    }
+
+    Notify.info("🔍 CodeXView! Found Codebase...");
+
     try {
-      const folder = getWorkspaceFolder();
-      if (!folder) {
-        Notify.error("❌ No workspace folder found.");
-        return;
-      }
+      loadIgnoreRules(); // Temporary placement.
 
-      if (!parseSetup(folder)) {
-        return Notify.error("Problem with permission!");
-      }
-
-      Notify.info("🔍 CodeXView! Found Codebase...");
-
-      const folderName = path.basename(folder);
-      const parsedCode = await parseCodeBase(folder);
+      const parsedCode = await analyzeCodebase();
 
       if (!parsedCode) {
         Notify.error("❌ Code parsing failed.");
@@ -95,7 +99,6 @@ async function activate(context) {
       // let diagramCode = "";
 
       // await addDiagramToProject(diagramCode, folder, folderName);
-
     } catch (error) {
       Notify.error(`❌ Error: ${error.message}`);
       console.error(error);
@@ -106,8 +109,7 @@ async function activate(context) {
 }
 
 /**
-* ==== DONT FORGET TO SET ROOT PATH!!! ====
-* save folder will be somewhere at the narnia.
+* this function for everytime extension runs.
 * @param {String} rootPathFs
 * @returns {boolean} is OK to continue?
 */
@@ -130,9 +132,10 @@ function parseSetup(rootPathFs) {
   return true;
 }
 
+/**
+* this function runs once.
+*/
 async function startUp() {
-  // empty for now
-  codexview.setup();
   // access keyvault
   KeyVault.init();
   AIConnection.apiKey = await KeyVault.getSecret(SECRET_ENUM.KEY);

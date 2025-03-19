@@ -12,6 +12,7 @@ const { parseFolder } = require("./provider");
 
 /** @type {Parser} */
 let parser = null;
+let isParsersLoaded = false;
 const lang_parsers = new Map();
 
 async function load_parsers() {
@@ -42,9 +43,10 @@ async function load_parsers() {
 
     shadow.set(extra.name, entry);
     lang_parsers.set(extra.name, config);
-    console.log(pico.green(` - Entry Loaded: ${extra.name}`));
+    console.log(pico.green(` - Entry Loaded: ${pico.cyan(extra.name)}`));
   }
 
+  isParsersLoaded = true;
   console.log(pico.cyan("Finished loading."));
 }
 
@@ -66,14 +68,30 @@ async function loadEntry(pathFs) {
   }
 }
 
+/**
+* @param {String} pathFs
+* @returns {Promise<Language>}
+*/
 async function loadParserWASM(pathFs) {
   const data = new Uint8Array(fs.readFileSync(pathFs));
-  const ParserLanguage = await Language.load(data);
-  return ParserLanguage;
+  return await Language.load(data);
+}
+
+/**
+* Look up time is O(1).
+*
+* Initialize the parsers, before retrieving.
+* @param {String} language
+* @returns {Language=}
+*/
+function getLanguageParser(language) {
+  if (!isParsersLoaded) throw Error("Parsers are not loaded yet!");
+  return lang_parsers.get(language?.toLowerCase());
 }
 
 module.exports = {
   getParser: () => parser,
   getLoadedParsers: () => lang_parsers,
+  getLanguageParser: getLanguageParser,
   load_parsers: load_parsers
 }

@@ -19,7 +19,7 @@ const BUILD_TARGET = {
   [BUILD_PLATFROM.MAC]: [BUILD_ARCH.X64, BUILD_ARCH.ARM64],
 }
 
-printFancyTitle(` Compiler Script. `);
+printFancyTitle("Compiler Script.");
 child_process.execSync("npm install", { stdio: "inherit" });
 child_process.execSync("npm audit fix", { stdio: "inherit" });
 
@@ -31,7 +31,7 @@ for (const platform of Object.keys(BUILD_TARGET)) {
     child_process.execSync(script, { stdio: "inherit" });
   }
 }
-printFancyTitle(` Successfully compiled. `);
+printFancyTitle("Successfully compiled.");
 
 
 // =================== UTILS ===================
@@ -39,7 +39,6 @@ function centerText(text = "", width = 0) {
   const leftPadding = Math.floor((width - text.length) / 2);
   return text.padStart(text.length + leftPadding, '-').padEnd(width, '-');
 }
-function isNull(obj) { return typeof obj === "object" && obj === null; }
 function clamp(maxv, value, minv) {
   return Math.min(maxv, Math.max(value, minv));
 }
