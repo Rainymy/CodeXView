@@ -8,6 +8,9 @@
     "vscode": "^1.97.0"
   },
   "categories": [
+    "Visualization",
+    "AI",
+    "Education",
     "Other"
   ],
   "icon": "./assets/icon_128x128.png",
