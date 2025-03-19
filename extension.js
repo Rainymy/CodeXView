@@ -4,7 +4,11 @@ const vscode = require('vscode');
 const { analyzeCodebase } = require("./src/utils/codebaseParser");
 const { generateCCDiagram } = require('./src/components/diagramGenerator');
 
-const { fetchFileToAnalyze, getWorkspaceFolder } = require('./src/utils/activeDocument');
+const {
+  getActiveDocumentFile,
+  selectFileDialog,
+  getWorkspaceFolder
+} = require('./src/utils/activeDocument');
 const { loadIgnoreRules } = require("./src/utils/ignoreRules");
 const { analyzeCode, syntaxTreeToJson } = require('./src/utils/codeParser');
 
@@ -25,13 +29,10 @@ const Notify = {
  * @param {vscode.ExtensionContext} context
  */
 async function activate(context) {
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with  registerCommand
-  // The commandId parameter must match the command field in package.json
   await startUp();
 
   const disposable = vscode.commands.registerCommand('codexview.run', async () => {
-    const selectedFile = await fetchFileToAnalyze();
+    const selectedFile = getActiveDocumentFile() ?? await selectFileDialog();
 
     if (!selectedFile) {
       Notify.error('No active document found / No file selected.');
@@ -41,7 +42,8 @@ async function activate(context) {
     Notify.info('CodeXView! Found File...');
 
     if (!parseSetup(path.dirname(selectedFile))) {
-      return Notify.error("⚠️ Problem with permission!");
+      Notify.error("⚠️ Problem with permission!");
+      return;
     }
 
     const parsedCode = analyzeCode(selectedFile);
@@ -55,7 +57,6 @@ async function activate(context) {
     // function count and names, and the same for variables, to check results.
 
     const diagram = await AIConnection.getChatResponse(parsedJson);
-    console.log("DiagramCode:", diagram);
 
     if (!diagram) {
       Notify.info('CodeXView! Failed to generate Diagram.');
@@ -63,6 +64,7 @@ async function activate(context) {
     }
 
     // add diagram to project
+    console.log("DiagramCode:", diagram);
     const added = await generateCCDiagram(diagram);
     if (added) {
       Notify.info('CodeXView! Finnished, Diagram has been added to your project...');
@@ -79,7 +81,8 @@ async function activate(context) {
     }
 
     if (!parseSetup(folder)) {
-      return Notify.error("⚠️ Problem with permission!");
+      Notify.error("⚠️ Problem with permission!");
+      return;
     }
 
     Notify.info("🔍 CodeXView! Found Codebase...");
