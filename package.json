@@ -40,7 +40,6 @@
     "@azure/identity": "^4.7.0",
     "@azure/keyvault-secrets": "^4.9.0",
     "@azure/openai": "^2.0.0",
-    "axios": "^1.8.1",
     "dotenv": "^16.4.7",
     "ignore": "^7.0.3",
     "jsonc-parser": "^3.3.1",

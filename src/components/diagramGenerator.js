@@ -1,5 +1,4 @@
 const path = require('path');
-const axios = require("axios");
 
 const { customWriteStream, readdirSync } = require("../utils/fileHandler");
 
@@ -11,10 +10,16 @@ async function generateCCDiagram(diagramCode) {
 
   const plantumlUrl = PlantUML.generateURL(PlantUML.encoder(cleanedOutput))
 
-  let response;
+  let data;
   try {
     // Fetch the PNG from PlantUML
-    response = await axios.get(plantumlUrl, { responseType: "arraybuffer" });
+    let response = await fetch(plantumlUrl, { method: "GET" });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    data = Buffer.from(await response.arrayBuffer());
   } catch (error) {
     console.error(`Network error : ${error.message}`);
     return false;
@@ -22,7 +27,7 @@ async function generateCCDiagram(diagramCode) {
 
   // write PNG to file
   const fileName = getNextFileName();
-  const error = await customWriteStream(fileName, response.data);
+  const error = await customWriteStream(fileName, data);
 
   if (error) {
     console.error(`Error generating CCD diagram: ${error.message}`);
