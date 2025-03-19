@@ -33,42 +33,41 @@ async function activate(context) {
   const disposable = vscode.commands.registerCommand('codexview.run', async () => {
     const selectedFile = await fetchFileToAnalyze();
 
-    if (selectedFile.length === 0) {
-      Notify.error('No file selected.');
+    if (!selectedFile) {
+      Notify.error('No active document found / No file selected.');
+      return;
     }
 
-    if (selectedFile.length > 0) {
-      Notify.info('CodeXView! Found File...');
+    Notify.info('CodeXView! Found File...');
 
-      if (!parseSetup(path.dirname(selectedFile))) {
-        return Notify.error("⚠️ Problem with permission!");
-      }
+    if (!parseSetup(path.dirname(selectedFile))) {
+      return Notify.error("⚠️ Problem with permission!");
+    }
 
-      const parsedCode = analyzeCode(selectedFile);
-      const parsedJson = syntaxTreeToJson(parsedCode);
+    const parsedCode = analyzeCode(selectedFile);
+    const parsedJson = syntaxTreeToJson(parsedCode);
 
-      Notify.info('CodeXView! Processing......');
+    Notify.info('CodeXView! Processing......');
 
-      console.log("parsedJson: ", parsedJson);
+    console.log("parsedJson: ", parsedJson);
 
-      // Get information from the parsed code, such as file count and names,
-      // function count and names, and the same for variables, to check results.
+    // Get information from the parsed code, such as file count and names,
+    // function count and names, and the same for variables, to check results.
 
-      const diagram = await AIConnection.getChatResponse(parsedJson);
-      console.log("DiagramCode:", diagram);
+    const diagram = await AIConnection.getChatResponse(parsedJson);
+    console.log("DiagramCode:", diagram);
 
-      if (!diagram) {
-        Notify.info('CodeXView! Failed to generate Diagram.');
-        return;
-      }
+    if (!diagram) {
+      Notify.info('CodeXView! Failed to generate Diagram.');
+      return;
+    }
 
-      // add diagram to project
-      const added = await generateCCDiagram(diagram);
-      if (added) {
-        Notify.info('CodeXView! Finnished, Diagram has been added to your project...');
-      } else {
-        Notify.error('CodeXView! Error adding diagram to project...');
-      }
+    // add diagram to project
+    const added = await generateCCDiagram(diagram);
+    if (added) {
+      Notify.info('CodeXView! Finnished, Diagram has been added to your project...');
+    } else {
+      Notify.error('CodeXView! Error adding diagram to project...');
     }
   });
 
