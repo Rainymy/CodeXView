@@ -10,7 +10,7 @@ class AIConnection {
     const cccExample = readCCDExample();
     try {
       //const response = await fetch('this.apiUrl ', {
-      const response = await fetch('localhost:5191/o1Chat', {
+      const response = await fetch(this.apiUrl, {
 
         method: 'POST',
         headers: {
