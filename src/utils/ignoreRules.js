@@ -15,7 +15,8 @@ const DEFAULT_ADDITIONAL_RULES = [
   "*.env",  // all environment files.
   "*.md",   // all markdown files.
   ".*",     // ALL dot files and folder.
-  "LICENSE" // ignore all LICENSEs
+  "LICENSE",// ignore all LICENSEs
+  "*.txt"   // Can't handle txt. // REASON: JS RegExp can't handle full PCRE.
 ];
 
 const COULD_NOT_FIND_IGNORE_RULES = [

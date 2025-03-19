@@ -1,4 +1,6 @@
 const fs = require('fs');
+const path = require('path');
+
 const jsonc = require("jsonc-parser");
 
 /**
@@ -123,7 +125,8 @@ function customWriteStream(filePathFs, data) {
 }
 
 function readCCDExample() {
-  return fs.readFileSync("ccd-example.txt", "utf8");
+  const ccd_example_txt = path.join(__dirname, "ccd-example.txt");
+  return fs.readFileSync(ccd_example_txt, "utf8");
 }
 
 module.exports = {
