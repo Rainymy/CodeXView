@@ -3,6 +3,7 @@
   "displayName": "CodeXView",
   "description": "",
   "version": "0.0.1",
+  "private": true,
   "engines": {
     "vscode": "^1.97.0"
   },
