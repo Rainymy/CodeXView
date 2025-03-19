@@ -111,6 +111,11 @@ function customWriteStream(filePathFs, data) {
   });
 }
 
+function readCCDExample() {
+  const data = fs.readFileSync("ccd-example.txt", { encoding: "utf8" });
+  return data
+}
+
 module.exports = {
   readJSONFileSync: readJSONFileSync,
   readdir: readdir,
@@ -120,5 +125,6 @@ module.exports = {
   writeFileSync: customWriteFileSync,
   deleteFile: deleteFile,
   customReadStream: customReadStream,
-  customWriteStream: customWriteStream
+  customWriteStream: customWriteStream,
+  readCCDExample: readCCDExample
 }
