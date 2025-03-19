@@ -1,53 +1,91 @@
 const ProjectConfig = require('../components/ProjectConfig');
 
 const path = require("path");
+const fs = require("fs");
 
 const {
   detectLanguageByPath,
   filterByProgrammingLanguage,
+  filterByLanguage,
   languagesSimpleStat
 } = require('../utils/detectLanguage');
-const { getParser, load_parsers } = require("../../parsers/loader");
+const {
+  getParser,
+  load_parsers,
+  getLanguageParser
+} = require("../../parsers/loader");
 
-const { loadAllFoldersWithIgnore, loadIgnoreRules } = require("../utils/ignoreRules");
+const {
+  loadAllFoldersWithIgnore,
+  loadIgnoreRules
+} = require("../utils/ignoreRules");
+
+/**
+* @typedef {import("./detectLanguage").DetectLanguage} DetectLanguage
+*/
+
+/**
+* @typedef {object} ParsedFile
+* @property  {String} file - File path
+* @property  {import("web-tree-sitter").Tree?} tree - Parsed syntax tree
+*/
 
 // Use github linguest package to identify/analys projact.
 async function parseCodeBase() {
-  const validFiles = loadAllFoldersWithIgnore(false);
+  const allFiles = loadAllFoldersWithIgnore(false);
 
-  const lang = detectLanguagesInFiles(validFiles);
-  const programmings = filterByProgrammingLanguage(lang.detected);
+  const detectedData = detectLanguagesInFiles(allFiles);
+  const sourceFiles = filterByProgrammingLanguage(detectedData.detected);
 
-  if (programmings.length === 0) {
+  if (sourceFiles.length === 0) {
     console.log("❌ Found No Programming Languages!");
     return null
   };
 
-  // if (detectedLanguages.size === 0) {
-  //   console.log("❌ No programming files detected in the folder.");
-  //   return null;
-  // }
+  const langStats = languagesSimpleStat(sourceFiles);
+  const detectedLanguages = langStats.languages.join((" "));
 
-  // if (detectedLanguages.size > 1) {
-  //   console.log("❌ Multiple programming languages found. Only one is allowed.");
-  //   return null;
-  // }
+  console.log(`- 🔍 Detected languages: [ ${detectedLanguages} ]`);
+  console.log(`- 📂 Found ${sourceFiles.length} source files.`);
 
-  const langStats = languagesSimpleStat(programmings);
-  console.log(`🔍 Detected languages: [ ${langStats.languages.join((" "))} ]`);
+  /** @type {ParsedFile[]} */
+  const syntaxTrees = langStats.languages.reduce((accum, language) => {
+    return [...accum, ...parseFilesForLanguage(sourceFiles, language)];
+  }, []);
 
-  // const parser = getParser();
-  // parser.setLanguage(lang);
+  return syntaxTrees;
+}
 
-  console.log(`📂 Found ${programmings.length} files.`);
+/**
+* @param {DetectLanguage[]} sourceFiles
+* @param {String} language
+* @returns {ParsedFile[]}
+*/
+function parseFilesForLanguage(sourceFiles, language) {
+  const parser = getParser();
+  const filesByLanguage = filterByLanguage(sourceFiles, language);
 
-  // ✅ Parse all matching files
-  // const parsedTrees = matchingFiles.map(file => ({
-  //   file,
-  //   tree: parser.parse(fs.readFileSync(file, "utf8"))
-  // }));
+  // This should never happen because it's checked/handled earlier.
+  if (filesByLanguage.length === 0) {
+    console.warn("⚠️  Unexpected state: filesByLanguage is empty.");
+    return [];
+  }
 
-  // return parsedTrees;
+  const fileLanguage = filesByLanguage[0].language;
+  const languageParser = getLanguageParser(fileLanguage);
+  if (!languageParser) {
+    console.warn(`⚠️  No parser available for language: ${fileLanguage}`);
+    return [];
+  }
+
+  parser.setLanguage(languageParser);
+
+  return filesByLanguage.map(file => {
+    return {
+      file: file.path,
+      tree: parser.parse(fs.readFileSync(file.path, "utf8"))
+    };
+  })
 }
 
 /**

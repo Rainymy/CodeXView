@@ -103,6 +103,15 @@ function languagesSimpleStat(langs) {
   }
 }
 
+/**
+*
+* @param {DetectLanguage[]} langs
+* @param {String} lng
+*/
+function filterByLanguage(langs, lng) {
+  return langs.filter(val => val.language === lng);
+}
+
 // function old() {
 //   const parsers = getLoadedParsers();
 //   if (parsers === undefined) throw Error("Load the parsers first!");
@@ -119,5 +128,6 @@ function languagesSimpleStat(langs) {
 module.exports = {
   detectLanguageByPath: detectLanguageByPath,
   filterByProgrammingLanguage: filterByProgrammingLanguage,
+  filterByLanguage: filterByLanguage,
   languagesSimpleStat: languagesSimpleStat
 }

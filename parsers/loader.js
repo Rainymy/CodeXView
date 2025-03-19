@@ -66,14 +66,26 @@ async function loadEntry(pathFs) {
   }
 }
 
+/**
+* @param {String} pathFs
+* @returns {Promise<Language>}
+*/
 async function loadParserWASM(pathFs) {
   const data = new Uint8Array(fs.readFileSync(pathFs));
-  const ParserLanguage = await Language.load(data);
-  return ParserLanguage;
+  return await Language.load(data);
+}
+
+/**
+* @param {String} language
+* @returns {Language=}
+*/
+function getLanguageParser(language) {
+  return lang_parsers.get(language?.toLowerCase());
 }
 
 module.exports = {
   getParser: () => parser,
   getLoadedParsers: () => lang_parsers,
+  getLanguageParser: getLanguageParser,
   load_parsers: load_parsers
 }
