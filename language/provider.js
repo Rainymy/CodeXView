@@ -1,14 +1,7 @@
-const { parse } = require("yaml");
 const fs = require("fs");
 const path = require("path");
 
-const root = path.join(__dirname);
-
-const languagesYML = path.join(root, "languages.yml");
-const heuristicsYML = path.join(root, "heuristics.yml");
-
-const languagesContent = fs.readFileSync(languagesYML, "utf8");
-const heuristicsContent = fs.readFileSync(heuristicsYML, "utf8");
+const { parse } = require("yaml");
 
 /**
 * To generate a types (d.ts) from JSON file.
@@ -17,9 +10,9 @@ const heuristicsContent = fs.readFileSync(heuristicsYML, "utf8");
 */
 
 /** @type {import("./language")}*/
-const languages = parse(languagesContent);
+const languages = parse(fs.readFileSync(path.join(__dirname, "languages.yml"), "utf8"));
 /** @type {import("./heuristics").Heuristics} Heuristics*/
-const heuristics = parse(heuristicsContent);
+const heuristics = parse(fs.readFileSync(path.join(__dirname, "heuristics.yml"), "utf8"));
 
 module.exports = {
   languages: languages,
