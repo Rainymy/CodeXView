@@ -1,14 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const jsonc = require("jsonc-parser");
+const JSONC = require("comment-json");
+// const JSONC = require("jsonc-parser"); // unfriendly to bundler.
 
 /**
 * @param {String} filePathFs
 * @returns {object}
 */
 function readJSONFileSync(filePathFs) {
-  return jsonc.parse(fs.readFileSync(filePathFs, "utf8"));
+  return JSONC.parse(fs.readFileSync(filePathFs, "utf8"));
 }
 
 /**
