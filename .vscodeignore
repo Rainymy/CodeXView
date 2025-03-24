@@ -6,5 +6,11 @@ test/**
 vsc-extension-quickstart.md
 **/jsconfig.json
 **/*.map
+**/tsconfig.json
 **/eslint.config.mjs
 **/.vscode-test.*
+node_modules
+out/
+src/
+webpack.config.js
+esbuild.js

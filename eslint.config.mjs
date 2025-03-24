@@ -25,6 +25,7 @@ export default [
   },
   {
     ignores: [
+      ".vscode*/", // ignore all folders starting with .vscode
       "dist/",
       "output/"
     ]
