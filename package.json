@@ -33,7 +33,6 @@
   },
   "scripts": {
     "lint": "eslint ./",
-    "pretest": "npm run lint",
     "test": "vscode-test",
     "vscode:prepublish": "npm run lint",
     "watch:esbuild": "node esbuild.js --watch",
