@@ -41,6 +41,9 @@ async function main() {
       /* add to the end of plugins array */
       esbuildProblemMatcherPlugin,
     ],
+    loader: {
+      ".yml": "text"
+    }
   });
   if (watch) {
     await ctx.watch();
