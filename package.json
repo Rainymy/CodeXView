@@ -18,7 +18,7 @@
     "color": "#1F6790"
   },
   "activationEvents": [],
-  "main": "dist/extension.js",
+  "main": "extension.js",
   "contributes": {
     "commands": [
       {
