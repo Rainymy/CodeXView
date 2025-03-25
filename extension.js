@@ -142,7 +142,7 @@ async function startUp() {
   KeyVault.init();
   AIConnection.apiKey = await KeyVault.getSecret(SECRET_ENUM.KEY);
   AIConnection.apiUrl = await KeyVault.getSecret(SECRET_ENUM.URL);
-
+  AIConnection.password = await KeyVault.getSecret(SECRET_ENUM.PASSWORD);
   // read configs from jsonc
   ProjectConfig.load(path.join(__dirname, "./config.jsonc"));
 
