@@ -24,6 +24,7 @@ async function load_parsers() {
 
   await Parser.init();
   parser = new Parser();
+  let duplicates = 0;
 
   if (entries.length === 0) {
     console.error(pico.red(` - No Entries Found!`));
@@ -33,7 +34,8 @@ async function load_parsers() {
     // check for duplicate entries.
     if (lang_parsers.has(entry.name)) {
       console.error(
-        pico.yellow(` - Duplicate Entry:\n\t${entry.name} ⇒ ${entry.path}`)
+        pico.yellow(` - Duplicate Entry:\n\t${entry.name} ⇒ ${entry.path}`) +
+        pico.red("").repeat(duplicates++)
       );
       continue;
     }
