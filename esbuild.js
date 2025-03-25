@@ -1,11 +1,14 @@
 const esbuild = require("esbuild");
 
+const fs = require("fs");
+const path = require("path");
+
 const production = process.argv.includes('--production');
 const watch = process.argv.includes('--watch');
 
-/**
- * @type {import('esbuild').Plugin}
- */
+const OUTPUT_FOLDER = "dist";
+
+/** @type {import('esbuild').Plugin} */
 const esbuildProblemMatcherPlugin = {
   name: 'esbuild-problem-matcher',
 
@@ -34,16 +37,31 @@ async function main() {
     sourcemap: !production,
     sourcesContent: false,
     platform: 'node',
-    outfile: 'dist/extension.js',
-    external: ['vscode'],
+    outfile: path.join(OUTPUT_FOLDER, './extension.js'),
+    external: ['vscode', "web-tree-sitter"],
     logLevel: "warning",
     plugins: [
       /* add to the end of plugins array */
       esbuildProblemMatcherPlugin,
+      copyStaticAssetsPlugin({
+        files: [
+          {
+            src: "./language/heuristics.yml",
+            dstFolder: "/"
+          },
+          {
+            src: "./language/languages.yml",
+            dstFolder: "/"
+          },
+          {
+            src: "./config.jsonc",
+            dstFolder: "/"
+          }
+        ],
+        outDir: OUTPUT_FOLDER
+      })
     ],
-    loader: {
-      ".yml": "text"
-    }
+    loader: {}
   });
   if (watch) {
     await ctx.watch();
@@ -59,6 +77,7 @@ main().catch(e => {
 });
 
 /**
+ * TODO: implement glob for src
  * Esbuild plugin to copy target files accessed via fs.readFileSync
  * @param {{ files: {src: string, dstFolder?: string}[], outDir: string }} options
  * @returns {import('esbuild').Plugin}
