@@ -1,5 +1,5 @@
-import globals from "globals";
-import js from "@eslint/js"
+const globals = require("globals");
+const js = require("@eslint/js");
 
 export default [
   js.configs.recommended,
@@ -27,7 +27,8 @@ export default [
     ignores: [
       ".vscode*/", // ignore all folders starting with .vscode
       "dist/",
-      "output/"
+      "output/",
+      "*.d.ts"
     ]
   }
 ];
