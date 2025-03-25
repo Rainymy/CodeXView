@@ -4,24 +4,24 @@ class AIConnection {
   constructor() {
     this.apiUrl = "";
     this.apiKey = "";
+    this.password = "";
   }
 
   async getChatResponse(parsedCode) {
     const cccExample = readCCDExample();
     try {
-      //const response = await fetch('this.apiUrl ', {
       const response = await fetch(this.apiUrl, {
-
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ApiKey': this.apiKey
+          'SecretKey': this.password
         },
         body: JSON.stringify({
           //deploymentName: "",
           //systemPrompt: "",
           cccExample: cccExample,
           diagramCode: parsedCode
+          //temperature: 1.0,
         })
       });
 
