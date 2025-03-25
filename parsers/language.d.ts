@@ -16,23 +16,12 @@ type NodeInfo =
     children: ChildNode[];
   });
 
-type Language = {
-  name: string;
-  language: unknown;
-  nodeTypeInfo: NodeInfo[];
-};
+type Language = import("web-tree-sitter").Language;
 
 type LoadEntry = {
   entry: Language | null,
   error: Error | null,
-  extra: languageEntry | null
-}
-
-type languageEntry = {
-  absolutePath: string,
-  name: string
 }
 
 export declare const language: Language;
 export declare const loadEntry: LoadEntry;
-export declare const languageEntry: languageEntry;
