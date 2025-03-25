@@ -1,13 +1,17 @@
-const pico = require("picocolors");
+const path = require("path");
 const fs = require("fs");
 
 const { Parser, Language } = require("web-tree-sitter");
+const pico = require("picocolors");
 
-const { parseFolder } = require("./provider");
+const { printFancyTitle } = require("../src/utils/fancyTitle");
+
+/** @type {Entries} */
+const entries = require("./entries.json");
 
 /**
  * @typedef {import('./language').LoadEntry} LoadEntry
- * @typedef {import('./language').languageEntry} languageEntry
+ * @typedef {import('./language').Entries} Entries
  */
 
 /** @type {Parser} */
@@ -16,18 +20,26 @@ let isParsersLoaded = false;
 const lang_parsers = new Map();
 
 async function load_parsers() {
+  printFancyTitle("Getting Loaders Ready");
+
   await Parser.init();
   parser = new Parser();
-
-  const shadow = new Map();
-  const entries = parseFolder();
 
   if (entries.length === 0) {
     console.error(pico.red(` - No Entries Found!`));
   }
 
   for (const entry of entries) {
-    const { entry: config, error, extra } = await loadEntry(entry);
+    // check for duplicate entries.
+    if (lang_parsers.has(entry.name)) {
+      console.error(
+        pico.yellow(` - Duplicate Entry:\n\t${entry.name} ⇒ ${entry.path}`)
+      );
+      continue;
+    }
+
+    const entryPath = path.join(__dirname, entry.path);
+    const { entry: config, error } = await loadEntry(entryPath);
 
     if (error) {
       console.error(pico.red(` - Fail to load: ${entry}`));
@@ -35,36 +47,24 @@ async function load_parsers() {
       continue;
     }
 
-    if (lang_parsers.has(extra.name)) {
-      const pre = shadow.get(extra.name);
-      console.error(pico.yellow(` - Duplicate Entry:\n\t${entry}\n\t${pre}`));
-      continue;
-    }
-
-    shadow.set(extra.name, entry);
-    lang_parsers.set(extra.name, config);
-    console.log(pico.green(` - Entry Loaded: ${pico.cyan(extra.name)}`));
+    lang_parsers.set(entry.name, config);
+    console.log(pico.green(` - Entry Loaded: ${pico.cyan(entry.name)}`));
   }
 
   isParsersLoaded = true;
-  console.log(pico.cyan("Finished loading."));
+  console.log(pico.cyan("Finished loading.\n"));
 }
 
 /**
-* @param {String} pathFs
+* @param {String} entryFile
 * @returns {Promise<LoadEntry>}
 */
-async function loadEntry(pathFs) {
+async function loadEntry(entryFile) {
   try {
-    /** @type {languageEntry} */
-    const entry = require(pathFs);
-    const parserLanguage = await loadParserWASM(entry.absolutePath);
-
-    // @ts-ignore
-    return { entry: parserLanguage, error: null, extra: entry };
+    return { entry: await loadParserWASM(entryFile), error: null };
   }
   catch (err) {
-    return { entry: null, error: err, extra: null };
+    return { entry: null, error: err };
   }
 }
 

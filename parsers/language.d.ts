@@ -16,6 +16,11 @@ type NodeInfo =
     children: ChildNode[];
   });
 
+type Entries = {
+  name: string,
+  path: string
+}[];
+
 type Language = import("web-tree-sitter").Language;
 
 type LoadEntry = {
@@ -25,3 +30,4 @@ type LoadEntry = {
 
 export declare const language: Language;
 export declare const loadEntry: LoadEntry;
+export declare const entries: Entries;
