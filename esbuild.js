@@ -2,6 +2,7 @@ const esbuild = require("esbuild");
 
 const fs = require("fs");
 const path = require("path");
+const fast_glob = require("fast-glob");
 
 const production = process.argv.includes('--production');
 const watch = process.argv.includes('--watch');
@@ -42,7 +43,8 @@ async function main() {
     logLevel: "warning",
     plugins: [
       /* add to the end of plugins array */
-      esbuildProblemMatcherPlugin,
+      // esbuildProblemMatcherPlugin,
+      cleanUpOutputFolder(OUTPUT_FOLDER),
       copyStaticAssetsPlugin({
         files: [
           {
@@ -126,24 +128,61 @@ function copyStaticAssetsPlugin({ files = [], outDir }) {
     setup(build) {
       build.onEnd(() => {
         for (const stat of files) {
-          const fileName = path.basename(stat.src);
+          const isGlobPattern = fast_glob.isDynamicPattern(stat.src);
 
-          const targetFile = safeJoin(outDir, [stat.dstFolder ?? "/", fileName]);
-          const sourceFile = safeJoin(__dirname, [stat.src]);
-
-          if (!fs.existsSync(sourceFile)) {
-            console.warn(`⚠️  Skipped missing file: ${sourceFile}`);
-            continue;
+          const getTargetPath = (file) => {
+            return safeJoin(outDir, [
+              stat.dstFolder ?? "/",
+              isGlobPattern ? file : path.basename(file)
+            ]);
           }
 
-          fs.mkdirSync(path.dirname(targetFile), { recursive: true });
-          fs.copyFileSync(sourceFile, targetFile);
+          const getSourcePath = (file) => { return safeJoin(__dirname, [file]); }
 
-          console.log(`📄 Copied asset: ${stat.src} → ${targetFile}`);
+          const sources = isGlobPattern
+            ? fast_glob.globSync(stat.src, { dot: true, extglob: true })
+            : [stat.src];
+
+          for (const src of sources) {
+            const sourcePath = getSourcePath(src);
+            const targetPath = getTargetPath(src);
+
+            if (!fs.existsSync(sourcePath)) {
+              console.warn(`⚠️  Skipped missing file: ${src}`);
+              return;
+            }
+            if (fs.existsSync(targetPath)) {
+              console.warn(`❌  Overwrite detected: ${targetPath}`);
+              return;
+            }
+
+            if (!makeHardCopy(sourcePath, targetPath)) {
+              console.log(`📄 Asset failed: ${src} → ${targetPath}`);
+              continue;
+            }
+            console.log(`📄 Copied asset: ${src} → ${targetPath}`);
+          }
         }
       });
     }
   };
+}
+
+
+/**
+* @param {String} sourceFile
+* @param {String} targetFile
+* @returns {Boolean}
+*/
+function makeHardCopy(sourceFile, targetFile) {
+  try {
+    fs.mkdirSync(path.dirname(targetFile), { recursive: true });
+    fs.copyFileSync(sourceFile, targetFile);
+    return true;
+  }
+  catch {
+    return false;
+  }
 }
 
 /**
