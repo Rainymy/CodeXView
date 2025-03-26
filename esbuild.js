@@ -48,12 +48,11 @@ async function main() {
       copyStaticAssetsPlugin({
         files: [
           {
-            src: "./language/heuristics.yml",
+            src: "./language/*.yml",
             dstFolder: "/"
           },
           {
-            src: "./language/languages.yml",
-            dstFolder: "/"
+            src: "./parsers/*/**"
           },
           {
             src: "./config.jsonc",
