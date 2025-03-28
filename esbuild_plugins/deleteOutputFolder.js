@@ -10,7 +10,7 @@ function cleanUpOutputFolder(dist) {
   return {
     name: "delete-output-folder",
     setup(build) {
-      build.onStart(() => {
+      build.onStart(async () => {
         const workingDirectory = path.join(__dirname, "..");
 
         const resolvedTarget = path.resolve(dist);
@@ -35,7 +35,17 @@ function cleanUpOutputFolder(dist) {
           throw new Error(`❌ Not a valid output directory: ${resolvedTarget}`);
         }
 
-        fs.rmSync(dist, { recursive: true });
+        return new Promise((resolve, reject) => {
+          fs.rm(dist, { recursive: true }, (err) => {
+            if (err) {
+              console.log(err.message);
+              return reject(err.message);
+            }
+
+            console.log(`Folder deleted successfully: ${dist}`);
+            resolve();
+          });
+        })
       })
     }
   }
