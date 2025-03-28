@@ -5,7 +5,7 @@ const fast_glob = require("fast-glob");
 const pathRightJoin = require("path-right-join");
 
 const { makeHardCopy, safeJoin } = require("./utils");
-
+const { logAssetTransfare, STATUS_KEY } = require("./assets");
 
 /**
 * @typedef {Object} AssetFile
@@ -54,20 +54,20 @@ function copyStaticAssetsPlugin({ files = [], outDir }) {
             const targetPath = getTargetPath(src);
 
             if (!fs.existsSync(sourcePath)) {
-              console.warn(`⚠️  Skipped missing file: ${src}`);
+              logAssetTransfare(STATUS_KEY.EXISTS, src, null);
               return;
             }
             if (fs.existsSync(targetPath)) {
-              console.warn(`❌  Overwrite detected: ${targetPath}`);
+              logAssetTransfare(STATUS_KEY.OVERWRITE, null, targetPath);
               return;
             }
 
             if (!makeHardCopy(sourcePath, targetPath)) {
-              console.log(`📄 Asset failed: ${src} → ${targetPath}`);
+              logAssetTransfare(STATUS_KEY.FAIL, sourcePath, targetPath);
               continue;
             }
 
-            console.log(`📄 Copied asset: ${src} → ${targetPath}`);
+            logAssetTransfare(STATUS_KEY.OK, src, targetPath);
           }
         }
       });
