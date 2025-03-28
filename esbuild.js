@@ -10,20 +10,14 @@ const watch = process.argv.includes('--watch');
 
 const OUTPUT_FOLDER = "dist";
 
+/**
+* @type {import("./esbuild_plugins/copyStaticAssets").StaticCopyConfig}
+*/
 const StaticAssetsConfig = {
   files: [
-    {
-      src: "./language/*.yml",
-      dstFolder: "/"
-    },
-    {
-      src: "./parsers/*/**",
-      dstFolder: "../"
-    },
-    {
-      src: "./config.jsonc",
-      dstFolder: "/"
-    }
+    { src: "./language/*.yml", dstFolder: "/" },
+    { src: "./parsers/*/**", dstFolder: "../" },
+    { src: "./config.jsonc", dstFolder: "/" },
   ],
   outDir: OUTPUT_FOLDER
 }
