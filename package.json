@@ -34,11 +34,11 @@
   "scripts": {
     "lint": "eslint ./",
     "test": "vscode-test",
-    "vscode:prepublish": "npm run lint && npm run compile:pro",
+    "vscode:prepublish": "npm run lint && npm run build:pro",
     "watch:esbuild": "node esbuild.js --watch",
     "package": "vsce package",
-    "compile": "node esbuild.js",
-    "compile:pro": "node esbuild.js --production"
+    "build": "node esbuild.js",
+    "build:pro": "node esbuild.js --production"
   },
   "repository": {
     "type": "git",
@@ -66,6 +66,7 @@
     "globby": "^14.1.0",
     "ignore": "^7.0.3",
     "jsonc-parser": "^3.3.1",
+    "path-right-join": "^1.0.0",
     "picocolors": "^1.1.1",
     "web-tree-sitter": "^0.25.3",
     "yaml": "^2.7.0"

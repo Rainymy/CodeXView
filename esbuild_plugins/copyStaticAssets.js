@@ -1,12 +1,27 @@
 const fs = require("fs");
 const path = require("path");
+
 const fast_glob = require("fast-glob");
+const pathRightJoin = require("path-right-join");
 
 const { makeHardCopy, safeJoin } = require("./utils");
 
+
+/**
+* @typedef {Object} AssetFile
+* @property {String} AssetFile.src
+* @property {String=} AssetFile.dstFolder
+*
+* @typedef {object} StaticCopyConfig
+* @property {AssetFile[]} files
+* @property {String} outDir
+*/
+
+const DEFAULT_OUTPUT_FOLDER = "/";
+
 /**
  * Esbuild plugin to copy target files accessed via fs.readFileSync
- * @param {{ files: {src: string, dstFolder?: string}[], outDir: string }} options
+ * @param {StaticCopyConfig} options
  * @returns {import('esbuild').Plugin}
  */
 function copyStaticAssetsPlugin({ files = [], outDir }) {
@@ -19,16 +34,11 @@ function copyStaticAssetsPlugin({ files = [], outDir }) {
           const workingDirectory = path.join(__dirname, "..");
 
           const getTargetPath = (file) => {
-
-            const temp = pathRightJoin(
-              stat.dstFolder ?? "/",
-              isGlobPattern ? "/" + file : path.basename(file)
+            const rightJoined = pathRightJoin(
+              stat.dstFolder ?? DEFAULT_OUTPUT_FOLDER,
+              isGlobPattern ? DEFAULT_OUTPUT_FOLDER + file : path.basename(file)
             );
-
-            return safeJoin(outDir, [
-              stat.dstFolder ?? "/",
-              isGlobPattern ? file : path.basename(file)
-            ]);
+            return safeJoin(outDir, [rightJoined]);
           }
 
           const getSourcePath = (file) => {
@@ -63,30 +73,6 @@ function copyStaticAssetsPlugin({ files = [], outDir }) {
       });
     }
   };
-}
-
-/**
-* Right-side join for paths, ignoring ".." from left segments.
-* @param  {string[]} segmantation Any number of path segments.
-* @returns {string} - Normalized, right-joined path.
-*/
-function pathRightJoin(...segmantation) {
-  const pathString = path.normalize(segmantation.map(path.normalize).join(""));
-  const segments = pathString.split(path.sep);
-  const result = [];
-
-  for (let i = 0; i < segments.length - 1; i++) {
-    const segment = segments[i];
-    // Skip ".." and the next segment.
-    if (segment === "..") {
-      i++;
-      continue;
-    }
-
-    result.push(segment);
-  }
-
-  return path.join(...result);
 }
 
 module.exports = copyStaticAssetsPlugin;
