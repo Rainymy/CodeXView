@@ -15,9 +15,10 @@ const OUTPUT_FOLDER = "dist";
 */
 const StaticAssetsConfig = {
   files: [
-    { src: "./language/*.yml", dstFolder: "/" },
+    { src: "./language/*.yml", dstFolder: "../" },
     { src: "./parsers/*/**", dstFolder: "../" },
     { src: "./config.jsonc", dstFolder: "/" },
+    { src: "./src/utils/ccd-example.txt", dstFolder: "/" },
   ],
   outDir: OUTPUT_FOLDER
 }
