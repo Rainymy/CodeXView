@@ -1,14 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const jsonc = require("jsonc-parser");
+const JSONC = require("comment-json");
+// const JSONC = require("jsonc-parser"); // unfriendly to bundler.
 
 /**
 * @param {String} filePathFs
 * @returns {object}
 */
 function readJSONFileSync(filePathFs) {
-  return jsonc.parse(fs.readFileSync(filePathFs, "utf8"));
+  return JSONC.parse(fs.readFileSync(filePathFs, "utf8"));
 }
 
 /**
@@ -89,7 +90,7 @@ function customWriteFileSync(filePathFs, data) {
 * @returns
 */
 function deleteFile(filePath) {
-  return new Promise((resolve, reject) => fs.unlink(filePath, resolve));
+  return new Promise((resolve) => fs.unlink(filePath, resolve));
 }
 
 /**
@@ -97,12 +98,12 @@ function deleteFile(filePath) {
 * @returns
 */
 function customReadStream(filePathFs) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let data = "";
     const readStream = fs.createReadStream(filePathFs, { flags: "r" });
     readStream.on("data", (chunks) => { data += chunks; });
     readStream.on("end", () => resolve(data));
-    readStream.on("error", (error) => resolve(null));
+    readStream.on("error", () => resolve(null));
   });
 }
 
@@ -112,7 +113,7 @@ function customReadStream(filePathFs) {
 * @returns
 */
 function customWriteStream(filePathFs, data) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const stream = fs.createWriteStream(filePathFs, { flags: "w+" });
     stream.on("ready", () => {
       stream.write(data);
