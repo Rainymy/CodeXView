@@ -18,8 +18,8 @@ async function activate(context) {
 
   const register = vscode.commands.registerCommand;
 
-  const disposable = register('codexview.run', fileAnalysis);
-  const disposable2 = register("codexview.runmultiple", codebaseAnalysis);
+  const disposable = register('codexview.file', fileAnalysis);
+  const disposable2 = register("codexview.codebase", codebaseAnalysis);
 
   context.subscriptions.push(disposable, disposable2);
 }

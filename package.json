@@ -22,12 +22,12 @@
   "contributes": {
     "commands": [
       {
-        "command": "codexview.run",
-        "title": "Run CodeXView"
+        "command": "codexview.file",
+        "title": "CodeXView: File Analysis"
       },
       {
-        "command": "codexview.runmultiple",
-        "title": "Run CodeXView multiple files"
+        "command": "codexview.codebase",
+        "title": "CodeXView: Workspace Analysis"
       }
     ]
   },
