@@ -10,6 +10,12 @@ const vscode = require('vscode');
 //   }
 // }
 
+const Notify = {
+  info: vscode.window.showInformationMessage,
+  warning: vscode.window.showWarningMessage,
+  error: vscode.window.showErrorMessage
+}
+
 /**
 * this function for everytime extension runs.
 * @param {String} rootPathFs
@@ -34,14 +40,24 @@ function parseSetup(rootPathFs) {
   return true;
 }
 
-const Notify = {
-  info: vscode.window.showInformationMessage,
-  warning: vscode.window.showWarningMessage,
-  error: vscode.window.showErrorMessage
-}
 
+/**
+* @param {String} identifier
+* @param {String} title
+* @returns
+*/
+function createWebviewPanel(identifier, title) {
+  return vscode.window.createWebviewPanel(
+    identifier, title, vscode.ViewColumn.Active,
+    {
+      enableScripts: true,
+      // retainContextWhenHidden: true
+    }
+  );
+}
 
 module.exports = {
   Notify: Notify,
-  parseSetup: parseSetup
+  parseSetup: parseSetup,
+  createWebviewPanel: createWebviewPanel
 }

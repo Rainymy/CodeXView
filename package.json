@@ -28,6 +28,10 @@
       {
         "command": "codexview.codebase",
         "title": "CodeXView: Workspace Analysis"
+      },
+      {
+        "command": "codexview.webview",
+        "title": "CodeXView: Create Webview Test"
       }
     ]
   },
