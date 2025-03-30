@@ -1,15 +1,27 @@
 {
   "compilerOptions": {
     "module": "nodenext",
-    "target": "es2024",
-    "moduleResolution": "nodenext",
     "resolveJsonModule": true,
     "checkJs": true,
+    "allowJs": true,
     "lib": [
-      "ES2024"
+      "ES2024",
+      "DOM"
     ]
   },
+  "include": [
+    "esbuild.js",
+    "extension.js",
+    "test/",
+    "src/",
+    "script/",
+    "parsers/",
+    "language/",
+    "esbuild_plugins/",
+    "commands/"
+  ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }
