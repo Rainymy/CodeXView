@@ -28,7 +28,7 @@ module.exports = [
       ".vscode*/", // ignore all folders starting with .vscode
       "dist/",
       "output/",
-      "*.d.ts"
+      "**.d.ts"
     ]
   }
 ];
