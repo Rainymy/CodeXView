@@ -10,6 +10,7 @@ module.exports = [
         ...globals.commonjs,
         ...globals.node,
         ...globals.mocha,
+        ...globals.browser
       },
     },
 
