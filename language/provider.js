@@ -9,10 +9,18 @@ const { parse } = require("yaml");
 * - npmjs  => https://www.npmjs.com/package/maketypes
 */
 
-/** @type {import("./language")}*/
-const languages = parse(fs.readFileSync(path.join(__dirname, "languages.yml"), "utf8"));
+/**
+* @param {String} filename
+* @returns
+*/
+function readYMLFile(filename) {
+  return fs.readFileSync(path.join(__dirname, filename), "utf8");
+}
+
+/** @type {import("./language").Language} Language */
+const languages = parse(readYMLFile("languages.yml"));
 /** @type {import("./heuristics").Heuristics} Heuristics*/
-const heuristics = parse(fs.readFileSync(path.join(__dirname, "heuristics.yml"), "utf8"));
+const heuristics = parse(readYMLFile("heuristics.yml"));
 
 module.exports = {
   languages: languages,
