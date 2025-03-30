@@ -25,10 +25,21 @@ function createWebview() {
 }
 
 function getWebviewContent() {
-  return fs.readFileSync(
+  let contentHTML = fs.readFileSync(
     path.join(__dirname, "./panels/mainWebview.html"),
     "utf8"
   );
+
+  // read index.js script.
+  const scriptContent = fs.readFileSync(
+    path.join(__dirname, "./panels/index.js"),
+    "utf8"
+  );
+
+  // replace template with contents of index.js.
+  contentHTML = contentHTML.replace('"{{__script__}}"', scriptContent);
+
+  return contentHTML;
 }
 
 module.exports = {
