@@ -1,19 +1,7 @@
-const globals = require("globals");
-const js = require("@eslint/js");
 
 module.exports = [
-  js.configs.recommended,
   {
     files: ["**/*.js"],
-    languageOptions: {
-      globals: {
-        ...globals.commonjs,
-        ...globals.node,
-        ...globals.mocha,
-        ...globals.browser
-      },
-    },
-
     rules: {
       "no-const-assign": "warn",
       "no-this-before-super": "warn",
