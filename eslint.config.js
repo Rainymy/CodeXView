@@ -1,7 +1,7 @@
-import globals from "globals";
-import js from "@eslint/js"
+const globals = require("globals");
+const js = require("@eslint/js");
 
-export default [
+module.exports = [
   js.configs.recommended,
   {
     files: ["**/*.js"],
@@ -21,5 +21,14 @@ export default [
       "no-unused-vars": "warn",
       "constructor-super": "warn",
       "valid-typeof": "warn",
-    },
-  }];
+    }
+  },
+  {
+    ignores: [
+      ".vscode*/", // ignore all folders starting with .vscode
+      "dist/",
+      "output/",
+      "*.d.ts"
+    ]
+  }
+];

@@ -20,12 +20,22 @@ function centerText(text, width) {
     .padEnd(newTextWidth, DEFAULT_TITLE_SYMBOL);
 }
 
+function ansiRegex() {
+  // Valid string terminator sequences are BEL, ESC\, and 0x9c
+  const ST = '(?:\\u0007|\\u001B\\u005C|\\u009C)';
+
+  const pattern = [
+    `[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?${ST})`,
+    '(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]))',
+  ].join('|');
+  return new RegExp(pattern, 'g');
+}
+
 /**
 * @param {String} str
 */
 function countAnsiEscapeChars(str) {
-  const ansiRegex = /\x1B\[[0-9;]*[A-Za-z]/g;
-  const matches = str.match(ansiRegex);
+  const matches = str.match(ansiRegex());
   return matches ? matches.join('').length : 0;
 };
 
@@ -35,7 +45,7 @@ function countAnsiEscapeChars(str) {
 * @param {String?} symbol
 */
 function printFancyTitle(text, width = columns, symbol = DEFAULT_PADDING_SYMBOL) {
-  printFancyMultilineTitle([text]);
+  printFancyMultilineTitle([text], width, symbol);
 }
 
 /**

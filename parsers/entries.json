@@ -1,0 +1,30 @@
+[
+  {
+    "name": "c",
+    "path": "./c/tree-sitter-c.wasm"
+  },
+  {
+    "name": "cpp",
+    "path": "./cpp/tree-sitter-cpp.wasm"
+  },
+  {
+    "name": "c#",
+    "path": "./csharp/tree-sitter-c_sharp.wasm"
+  },
+  {
+    "name": "java",
+    "path": "./java/tree-sitter-java.wasm"
+  },
+  {
+    "name": "javascript",
+    "path": "./javascript/tree-sitter-javascript.wasm"
+  },
+  {
+    "name": "python",
+    "path": "./python/tree-sitter-python.wasm"
+  },
+  {
+    "name": "ruby",
+    "path": "./ruby/tree-sitter-ruby.wasm"
+  }
+]

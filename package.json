@@ -18,7 +18,7 @@
     "color": "#1F6790"
   },
   "activationEvents": [],
-  "main": "./extension.js",
+  "main": "extension.js",
   "contributes": {
     "commands": [
       {
@@ -33,8 +33,12 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "pretest": "npm run lint",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "vscode:prepublish": "npm run lint && npm run build:pro",
+    "watch:esbuild": "node esbuild.js --watch",
+    "package": "vsce package",
+    "build": "node esbuild.js",
+    "build:pro": "node esbuild.js --production"
   },
   "repository": {
     "type": "git",
@@ -50,14 +54,19 @@
     "@types/vscode": "^1.97.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
+    "esbuild": "^0.25.1",
     "eslint": "^9.16.0"
   },
   "dependencies": {
     "@azure/identity": "^4.7.0",
     "@azure/keyvault-secrets": "^4.9.0",
     "@azure/openai": "^2.0.0",
+    "comment-json": "^4.2.5",
+    "fast-glob": "^3.3.3",
+    "globby": "^14.1.0",
     "ignore": "^7.0.3",
     "jsonc-parser": "^3.3.1",
+    "path-right-join": "^1.0.0",
     "picocolors": "^1.1.1",
     "web-tree-sitter": "^0.25.3",
     "yaml": "^2.7.0"
