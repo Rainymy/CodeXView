@@ -10,6 +10,7 @@ module.exports = [
         ...globals.commonjs,
         ...globals.node,
         ...globals.mocha,
+        ...globals.browser
       },
     },
 
@@ -28,7 +29,7 @@ module.exports = [
       ".vscode*/", // ignore all folders starting with .vscode
       "dist/",
       "output/",
-      "*.d.ts"
+      "**.d.ts"
     ]
   }
 ];

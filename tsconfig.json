@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "checkJs": true,
+    "allowJs": true,
+    "noEmit": true,
+    // "strict": true,
+    "lib": [
+      "ES2024",
+      "DOM"
+    ]
+  },
+  "include": [
+    "esbuild.js",
+    "extension.js",
+    "test/",
+    "src/",
+    "script/",
+    "parsers/",
+    "language/",
+    "esbuild_plugins/",
+    "commands/"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

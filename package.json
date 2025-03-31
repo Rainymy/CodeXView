@@ -22,12 +22,16 @@
   "contributes": {
     "commands": [
       {
-        "command": "codexview.run",
-        "title": "Run CodeXView"
+        "command": "codexview.file",
+        "title": "CodeXView: File Analysis"
       },
       {
-        "command": "codexview.runmultiple",
-        "title": "Run CodeXView multiple files"
+        "command": "codexview.codebase",
+        "title": "CodeXView: Workspace Analysis"
+      },
+      {
+        "command": "codexview.webview",
+        "title": "CodeXView: Create Webview Test"
       }
     ]
   },
@@ -52,6 +56,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
     "@types/vscode": "^1.97.0",
+    "@types/vscode-webview": "^1.57.5",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
     "esbuild": "^0.25.1",
