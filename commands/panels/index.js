@@ -3,7 +3,7 @@ const vscode = acquireVsCodeApi();
 const counter = document.getElementById("lines-of-code-counter");
 
 let count = 0;
-let intervalID = setInterval(() => {
+const intervalID = setInterval(() => {
   counter.textContent = (count++).toString();
 
   // stop the interval;

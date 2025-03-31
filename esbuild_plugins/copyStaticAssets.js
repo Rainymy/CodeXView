@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 
 const fast_glob = require("fast-glob");
 const pathRightJoin = require("path-right-join");

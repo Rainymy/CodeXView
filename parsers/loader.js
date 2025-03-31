@@ -1,5 +1,5 @@
-const path = require("path");
-const fs = require("fs");
+const path = require("node:path");
+const fs = require("node:fs");
 
 const { Parser, Language } = require("web-tree-sitter");
 const pico = require("picocolors");
@@ -27,7 +27,7 @@ async function load_parsers() {
   let duplicates = 0;
 
   if (entries.length === 0) {
-    console.error(pico.red(` - No Entries Found!`));
+    console.error(pico.red(" - No Entries Found!"));
   }
 
   for (const entry of entries) {
