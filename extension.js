@@ -10,7 +10,7 @@ const { KeyVault, SECRET_ENUM } = require("./src/components/Keyvault");
 const fileAnalysis = require("./commands/file.js");
 const codebaseAnalysis = require("./commands/codebase.js");
 const { createWebview } = require("./commands/webview.js");
-
+const newDiagram = require("./commands/newdiagram.js");
 /**
  * @param {vscode.ExtensionContext} context
  */
@@ -22,8 +22,8 @@ async function activate(context) {
   const disposable = register('codexview.file', fileAnalysis);
   const disposable2 = register("codexview.codebase", codebaseAnalysis);
   const disposable3 = register("codexview.webview", createWebview);
-
-  context.subscriptions.push(disposable, disposable2, disposable3);
+  const disposable4 = register("codexview.newdiagramtest", newDiagram);
+  context.subscriptions.push(disposable, disposable2, disposable3, disposable4);
 }
 
 /**

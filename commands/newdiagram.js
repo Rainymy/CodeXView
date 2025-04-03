@@ -1,7 +1,7 @@
-const path = require("path");
-
-const { generateCCDiagram } = require('../src/components/diagramGenerator');
-
+const { readPrompt } = require("../src/utils/fileHandler");
+const fs = require('fs');
+const path = require('path');
+const vscode = require('vscode');
 const { getActiveDocumentFile, selectFileDialog } = require('../src/utils/activeDocument');
 const { analyzeCode, syntaxTreeToJson } = require('../src/utils/codeParser');
 
@@ -9,7 +9,7 @@ const { Notify, parseSetup } = require("./vsUtil");
 
 const AIConnection = require("../src/components/AIConnection");
 
-async function fileAnalysis() {
+async function newDiagram() {
   const selectedFile = getActiveDocumentFile() ?? await selectFileDialog();
 
   if (!selectedFile) {
@@ -33,22 +33,29 @@ async function fileAnalysis() {
 
   //Get information from the parsed code, such as file count and names,
   //function count and names, and the same for variables, to check results.
-
+  AIConnection.prompt = readPrompt();
   const diagram = await AIConnection.getChatResponse(parsedJson);
 
   if (!diagram) {
     Notify.info('CodeXView! Failed to generate Diagram.');
     return;
   }
-
-  // add diagram to project
-  console.log("DiagramCode:", diagram);
-  const added = await generateCCDiagram(diagram);
-  if (added) {
-    Notify.info('CodeXView! Finnished, Diagram has been added to your project...');
+  console.log("XML Code:", diagram);
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (workspaceFolders && workspaceFolders.length > 0) {
+    const folderPath = workspaceFolders[0].uri.fsPath;
+    const filePath = path.join(folderPath, 'diagram.xml');
+    let cleaned = diagram.replace(/^```xml\s*\n/, '').replace(/\n```$/, ''); 
+    fs.writeFile(filePath, cleaned, (err) => {
+      if (err) {
+        vscode.window.showErrorMessage('Failed to write XML file: ' + err.message);
+      } else {
+        vscode.window.showInformationMessage('diagram.xml created in workspace folder!');
+      }
+    });
   } else {
-    Notify.error('CodeXView! Error adding diagram to project...');
+    vscode.window.showErrorMessage('No workspace folder found.');
   }
 }
 
-module.exports = fileAnalysis;
+module.exports = newDiagram;

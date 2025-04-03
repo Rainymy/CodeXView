@@ -5,6 +5,7 @@ class AIConnection {
     this.apiUrl = "";
     this.apiKey = "";
     this.password = "";
+    this.prompt = "";
   }
 
   async getChatResponse(parsedCode) {
@@ -18,7 +19,7 @@ class AIConnection {
         },
         body: JSON.stringify({
           //deploymentName: "",
-          //systemPrompt: "",
+          systemPrompt: this.prompt,
           cccExample: cccExample,
           diagramCode: parsedCode
           //temperature: 1.0,
