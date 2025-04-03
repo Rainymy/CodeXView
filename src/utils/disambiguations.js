@@ -1,6 +1,6 @@
 const { readFileSync } = require("./fileHandler");
 
-const { heuristics } = require("../../language/provider");
+const { heuristics, convertToJSRegex } = require("../../language/provider");
 
 /**
 * @typedef {import("../../language/heuristics.js").RulesEntity} RulesEntity
@@ -61,12 +61,7 @@ function parseRules(rules, fileContent) {
 * @returns {RegExp}
 */
 function toRegex(patterns) {
-  // Built-in RegExp, cant handle PCRE RegExp standard,
-  // const XRegExp = require("xregexp"); // this might be solve it.
-  // npm install xregexp
-  return Array.isArray(patterns)
-    ? new RegExp(patterns.join("|"))
-    : new RegExp(patterns);
+  return convertToJSRegex(patterns);
 }
 
 module.exports = {

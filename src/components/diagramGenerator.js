@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('node:path');
 
 const { customWriteStream, readdirSync } = require("../utils/fileHandler");
 
@@ -13,7 +13,7 @@ async function generateCCDiagram(diagramCode) {
   let data;
   try {
     // Fetch the PNG from PlantUML
-    let response = await fetch(plantumlUrl, { method: "GET" });
+    const response = await fetch(plantumlUrl, { method: "GET" });
 
     if (!response.ok) {
       return false;

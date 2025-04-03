@@ -1,7 +1,7 @@
 const { languages } = require("../../language/provider");
 const { disambiguations } = require("./disambiguations");
 
-const path = require("path");
+const path = require("node:path");
 const { existsSync } = require("./fileHandler");
 
 /**

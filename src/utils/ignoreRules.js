@@ -1,5 +1,5 @@
-const path = require("path");
-const fs = require("fs");
+const path = require("node:path");
+const fs = require("node:fs");
 
 const ignore = require("ignore");
 const pico = require("picocolors");
@@ -16,7 +16,6 @@ const DEFAULT_ADDITIONAL_RULES = [
   "*.md",   // all markdown files.
   ".*",     // ALL dot files and folder.
   "LICENSE",// ignore all LICENSEs
-  "*.txt"   // Can't handle txt. // REASON: JS RegExp can't handle full PCRE.
 ];
 
 const COULD_NOT_FIND_IGNORE_RULES = [
