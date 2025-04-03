@@ -129,6 +129,11 @@ function readCCDExample() {
   return fs.readFileSync(ccd_example_txt, "utf8");
 }
 
+function readPrompt() {
+  const prompt = path.join(__dirname, "prompt.txt");
+  return fs.readFileSync(prompt, "utf8");
+}
+
 module.exports = {
   readJSONFileSync: readJSONFileSync,
   readFileSync: readFileSync,
@@ -141,5 +146,6 @@ module.exports = {
   deleteFile: deleteFile,
   customReadStream: customReadStream,
   customWriteStream: customWriteStream,
-  readCCDExample: readCCDExample
+  readCCDExample: readCCDExample,
+  readPrompt: readPrompt
 }

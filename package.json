@@ -32,6 +32,10 @@
       {
         "command": "codexview.webview",
         "title": "CodeXView: Create Webview Test"
+      },
+      {
+        "command": "codexview.newdiagramtest",
+        "title": "CodeXView: Test New Diagram"
       }
     ]
   },
@@ -69,9 +73,11 @@
     "comment-json": "^4.2.5",
     "fast-glob": "^3.3.3",
     "ignore": "^7.0.3",
+    "jointjs": "^3.7.7",
     "oniguruma-to-es": "^4.1.0",
     "path-right-join": "^1.0.0",
     "picocolors": "^1.1.1",
+    "viz.js": "^2.1.2",
     "web-tree-sitter": "^0.25.3",
     "yaml": "^2.7.0"
   }

@@ -1,0 +1,17 @@
+Your task is to convert a JSON representation of a parsed codebase into an XML-based Class Collaboration Diagram.
+
+Steps:
+1.	Parse the JSON structure of the codebase.
+2.	Create a node for each class.
+    •	If a class has variables, list them on their own rows.
+3.	Identify state-changing methods in each class.
+•	For each state change, draw an arrow from the class where the change occurs to the class it affects.
+4   .	Label each arrow with the name of the method responsible for the state change.
+5.	Ensure that:
+    •	Arrows are straight or gently bent, not curved.
+    •	Arrow labels do not overlap with any class nodes or other arrows.
+6.	Adjust the size and position of each class node to meet the requirements of step 5.
+7.	Review the example XML provided to understand the expected format and structure.
+8.	Return only valid XML, with no comments or additional explanations.
+
+Here is an example of a Class Collaboration Diagrams in XML:
