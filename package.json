@@ -77,7 +77,6 @@
     "oniguruma-to-es": "^4.1.0",
     "path-right-join": "^1.0.0",
     "picocolors": "^1.1.1",
-    "puppeteer": "^24.4.0",
     "viz.js": "^2.1.2",
     "web-tree-sitter": "^0.25.3",
     "yaml": "^2.7.0"
