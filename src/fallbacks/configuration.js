@@ -13,8 +13,7 @@ function fallbackConfig() {
   const { contributes } = require("../../package.json");
   const props = contributes.configuration[0].properties;
 
-  // @ts-ignore
-  for (let key in props) {
+  for (const key in props) {
     const prefix = key.split(`${ConfigKeys.Name}.`)[1];
 
     devSettings.set(prefix, props[key].default);
