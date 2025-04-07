@@ -2,7 +2,7 @@ const { readPrompt } = require("../src/utils/fileHandler");
 const fs = require('fs');
 const path = require('path');
 const vscode = require('vscode');
-const { getActiveDocumentFile, selectFileDialog } = require('../src/utils/activeDocument');
+const { getActiveDocumentFile, selectFileDialog } = require('../src/fallbacks/activeDocument');
 const { analyzeCode, syntaxTreeToJson } = require('../src/utils/codeParser');
 
 const { Notify, parseSetup } = require("./vsUtil");
@@ -45,7 +45,7 @@ async function newDiagram() {
   if (workspaceFolders && workspaceFolders.length > 0) {
     const folderPath = workspaceFolders[0].uri.fsPath;
     const filePath = path.join(folderPath, 'diagram.xml');
-    let cleaned = diagram.replace(/^```xml\s*\n/, '').replace(/\n```$/, ''); 
+    let cleaned = diagram.replace(/^```xml\s*\n/, '').replace(/\n```$/, '');
     fs.writeFile(filePath, cleaned, (err) => {
       if (err) {
         vscode.window.showErrorMessage('Failed to write XML file: ' + err.message);
