@@ -17,14 +17,14 @@ function ProjectConfig() {
   /** @type {Boolean} */
   let createFile = null;
   /** @type {Boolean} */
-  let loadIgnoreRules = null;
+  let ignoreRulesFromWorkspace = null;
   /** @type {WorkspaceConfiguration} */
   let config = null;
   let rootPath = "";
 
   this.canCreateFolder = () => saveFolder && createFolder;
   this.canCreateFile = () => saveFolder && createFile;
-  this.readRootIgnoreRules = () => loadIgnoreRules;
+  this.readRootIgnoreRules = () => ignoreRulesFromWorkspace;
   this.getOutputFolder = () => path.join(rootPath, saveFolder);
   this.getRootFolder = () => {
     if (rootPath === "") {
@@ -42,7 +42,7 @@ function ProjectConfig() {
     saveFolder = config.get(ConfigKeys.SaveFolder);
     createFolder = config.get(ConfigKeys.CanCreateFolder);
     createFile = config.get(ConfigKeys.CanCreateFile);
-    loadIgnoreRules = config.get(ConfigKeys.LoadIgnoreRulesFromWorkspace);
+    ignoreRulesFromWorkspace = config.get(ConfigKeys.LoadIgnoreRulesFromWorkspace);
   }
 }
 
