@@ -1,15 +1,5 @@
-const fs = require(`fs`);
+const fs = require("node:fs");
 const path = require('node:path');
-
-const JSONC = require("comment-json");
-
-/**
-* @param {String} filePathFs
-* @returns {object}
-*/
-function readJSONFileSync(filePathFs) {
-  return JSONC.parse(fs.readFileSync(filePathFs, "utf8"));
-}
 
 /**
 * @param {String} filePathFs
@@ -20,6 +10,10 @@ function readFileSync(filePathFs, encoding) {
   return fs.readFileSync(filePathFs, encoding);
 }
 
+/**
+* @param {String} filePathFs
+* @returns
+*/
 function existsSync(filePathFs) {
   return fs.existsSync(filePathFs);
 }
@@ -135,7 +129,6 @@ function readPrompt() {
 }
 
 module.exports = {
-  readJSONFileSync: readJSONFileSync,
   readFileSync: readFileSync,
   existsSync: existsSync,
   readdir: readdir,

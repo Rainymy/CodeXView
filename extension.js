@@ -23,7 +23,12 @@ async function activate(context) {
   const disposable2 = register("codexview.codebase", codebaseAnalysis);
   const disposable3 = register("codexview.webview", createWebview);
   const disposable4 = register("codexview.newdiagramtest", newDiagram);
-  context.subscriptions.push(disposable, disposable2, disposable3, disposable4);
+
+  const allDisposables = [
+    disposable, disposable2, disposable3, disposable4
+  ]
+
+  context.subscriptions.push(...allDisposables);
 }
 
 /**

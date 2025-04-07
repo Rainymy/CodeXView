@@ -35,6 +35,7 @@ function KeyVault() {
   /**
   * @param {String=} key
   * @returns
+  * @throws if secret not found
   */
   this.getSecret = async (key) => {
     if (!client) throw Error("Client not found");
