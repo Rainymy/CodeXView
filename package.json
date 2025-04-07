@@ -37,6 +37,33 @@
         "command": "codexview.newdiagramtest",
         "title": "CodeXView: Test New Diagram"
       }
+    ],
+    "configuration": [
+      {
+        "title": "CodeXView",
+        "properties": {
+          "codexview.saveFolder": {
+            "type": "string",
+            "default": "CodeXView",
+            "description": "Relative path from workspace root where output files will be saved. The folder will be created if it doesn't exist."
+          },
+          "codexview.canCreateFolder": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether CodeXView should automatically create the save folder if it doesn't exist."
+          },
+          "codexview.canCreateFile": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether CodeXView should create output files inside the save folder."
+          },
+          "codexview.loadIgnoreRulesFromWorkspace": {
+            "type": "boolean",
+            "default": true,
+            "description": "If true, CodeXView will load ignore rules from the workspace root (e.g. .gitignore)."
+          }
+        }
+      }
     ]
   },
   "scripts": {

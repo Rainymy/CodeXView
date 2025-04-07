@@ -1,4 +1,3 @@
-const path = require("node:path");
 const vscode = require('vscode');
 
 const { load_parsers } = require("./parsers/loader.js");
@@ -11,6 +10,7 @@ const fileAnalysis = require("./commands/file.js");
 const codebaseAnalysis = require("./commands/codebase.js");
 const { createWebview } = require("./commands/webview.js");
 const newDiagram = require("./commands/newdiagram.js");
+
 /**
  * @param {vscode.ExtensionContext} context
  */
@@ -35,8 +35,8 @@ async function startUp() {
   AIConnection.apiKey = await KeyVault.getSecret(SECRET_ENUM.KEY);
   AIConnection.apiUrl = await KeyVault.getSecret(SECRET_ENUM.URL);
   AIConnection.password = await KeyVault.getSecret(SECRET_ENUM.PASSWORD);
-  // read configs from jsonc
-  ProjectConfig.load(path.join(__dirname, "./config.jsonc"));
+
+  ProjectConfig.load();
 
   await load_parsers();
 }
