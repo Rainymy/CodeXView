@@ -16,8 +16,7 @@
     ]
   },
   "include": [
-    "esbuild.js",
-    "extension.js",
+    "*.js",
     "test/",
     "src/",
     "script/",
