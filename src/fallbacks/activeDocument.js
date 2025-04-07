@@ -30,4 +30,4 @@ module.exports = {
   selectFileDialog: selectFileDialog,
   getActiveDocumentFile: getActiveDocumentFile,
   getWorkspaceFolder: getWorkspaceFolder
-};
+}

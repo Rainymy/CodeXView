@@ -40,7 +40,8 @@ async function analyzeCodebase() {
 
   /** @type {ParsedFile[]} */
   const syntaxTrees = langStats.languages.reduce((accum, language) => {
-    return [...accum, ...parseFilesForLanguage(sourceFiles, language)];
+    accum.push(...parseFilesForLanguage(sourceFiles, language))
+    return accum;
   }, []);
 
   return syntaxTrees;

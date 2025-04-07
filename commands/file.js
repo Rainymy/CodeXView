@@ -2,7 +2,7 @@ const path = require("node:path");
 
 const { generateCCDiagram } = require('../src/components/diagramGenerator');
 
-const { getActiveDocumentFile, selectFileDialog } = require('../src/utils/activeDocument');
+const { getActiveDocumentFile, selectFileDialog } = require('../src/fallbacks/activeDocument');
 const { analyzeCode, syntaxTreeToJson } = require('../src/utils/codeParser');
 
 const { Notify, parseSetup } = require("./vsUtil");

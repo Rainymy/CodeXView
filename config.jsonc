@@ -1,9 +1,0 @@
-{
-  // Project save folder.
-  "saveFolder": "./CodeXView",
-  "LOAD_IGNORE_RULES_FROM_ROOT": true,
-  // create "saveFolder" folder/file incase it doesn't exist.
-  // word sensetive: True/true => true - False/false/<anything> => false;
-  "canCreateFolder": true,
-  "canCreateFile": true
-}

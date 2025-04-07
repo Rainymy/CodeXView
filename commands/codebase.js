@@ -1,5 +1,5 @@
 const { analyzeCodebase } = require("../src/utils/codebaseParser");
-const { getWorkspaceFolder } = require('../src/utils/activeDocument');
+const { getWorkspaceFolder } = require('../src/fallbacks/activeDocument');
 const { loadIgnoreRules } = require("../src/utils/ignoreRules");
 
 const { Notify, parseSetup } = require("./vsUtil");
