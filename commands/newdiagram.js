@@ -41,21 +41,21 @@ async function newDiagram() {
     return;
   }
   console.log("XML Code:", diagram);
-  const workspaceFolders = vscode.workspace.workspaceFolders;
-  if (workspaceFolders && workspaceFolders.length > 0) {
-    const folderPath = workspaceFolders[0].uri.fsPath;
-    const filePath = path.join(folderPath, 'diagram.xml');
-    const cleaned = diagram.replace(/^```xml\s*\n/, '').replace(/\n```$/, '');
-    fs.writeFile(filePath, cleaned, (err) => {
-      if (err) {
-        vscode.window.showErrorMessage(`Failed to write XML file: ${err.message}`);
-      } else {
-        vscode.window.showInformationMessage('diagram.xml created in workspace folder!');
-      }
-    });
-  } else {
-    vscode.window.showErrorMessage('No workspace folder found.');
-  }
+  //const workspaceFolders = vscode.workspace.workspaceFolders;
+  // if (workspaceFolders && workspaceFolders.length > 0) {
+  //   const folderPath = workspaceFolders[0].uri.fsPath;
+  //   const filePath = path.join(folderPath, 'diagram.xml');
+  //   const cleaned = diagram.replace(/^```xml\s*\n/, '').replace(/\n```$/, '');
+  //   fs.writeFile(filePath, cleaned, (err) => {
+  //     if (err) {
+  //       vscode.window.showErrorMessage(`Failed to write XML file: ${err.message}`);
+  //     } else {
+  //       vscode.window.showInformationMessage('diagram.xml created in workspace folder!');
+  //     }
+  //   });
+  // } else {
+  //   vscode.window.showErrorMessage('No workspace folder found.');
+  // }
 }
 
 module.exports = newDiagram;

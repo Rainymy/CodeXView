@@ -22,7 +22,6 @@ class AIConnection {
           systemPrompt: this.prompt,
           cccExample: cccExample,
           diagramCode: parsedCode
-          //temperature: 1.0,
         })
       });
 
