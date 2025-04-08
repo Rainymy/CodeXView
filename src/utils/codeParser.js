@@ -34,12 +34,12 @@ function analyzeCode(filePath) {
 * @param {Tree} tree
 * @returns
 */
-function syntaxTreeToJson(tree) {
-  if (!tree || !tree.rootNode) {
-    throw new Error("Invalid syntax tree");
-  }
-  return syntaxNodeToJson(tree.rootNode);
-}
+// function syntaxTreeToJson(tree) {
+//   if (!tree || !tree.rootNode) {
+//     throw new Error("Invalid syntax tree");
+//   }
+//   return syntaxNodeToJson(tree.rootNode);
+// }
 
 /**
 * ✅ Helper function to recursively convert a SyntaxNode to JSON
@@ -47,15 +47,15 @@ function syntaxTreeToJson(tree) {
 * @param {Node} node
 * @returns
 */
-function syntaxNodeToJson(node) {
-  // TODO: CONVERT THIS INTO WHILE LOOP
-  // (Recursively is bad idea with huge data)
-  return {
-    type: node.type,
-    text: node.text, // Extract raw text
-    children: node.children.map(syntaxNodeToJson) // Recursively process children
-  };
-}
+// function syntaxNodeToJson(node) {
+//   // TODO: CONVERT THIS INTO WHILE LOOP
+//   // (Recursively is bad idea with huge data)
+//   return {
+//     type: node.type,
+//     text: node.text, // Extract raw text
+//     children: node.children.map(syntaxNodeToJson) // Recursively process children
+//   };
+// }
 
 /**
 * @param {Tree} tree
@@ -89,6 +89,6 @@ function syntaxTreeToJson_NEW(tree) {
 
 module.exports = {
   analyzeCode: analyzeCode,
-  syntaxTreeToJson: syntaxTreeToJson
-  // syntaxTreeToJson: syntaxTreeToJson_NEW // <-- try this
+  //syntaxTreeToJson: syntaxTreeToJson
+  syntaxTreeToJson: syntaxTreeToJson_NEW // <-- try this
 };

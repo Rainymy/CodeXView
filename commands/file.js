@@ -1,3 +1,5 @@
+const { readPrompt } = require('../src/utils/fileHandler')
+
 const path = require("node:path");
 
 const { generateCCDiagram } = require('../src/components/diagramGenerator');
@@ -33,7 +35,7 @@ async function fileAnalysis() {
 
   //Get information from the parsed code, such as file count and names,
   //function count and names, and the same for variables, to check results.
-
+  AIConnection.prompt = readPrompt();
   const diagram = await AIConnection.getChatResponse(parsedJson);
 
   if (!diagram) {
