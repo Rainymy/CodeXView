@@ -1,12 +1,13 @@
-const { readPrompt } = require('../src/utils/fileHandler')
-
 const path = require("node:path");
+
+const { readPrompt } = require('../src/utils/fileHandler');
+const { analyzeCode } = require('../src/utils/codeParser');
 
 const { generateCCDiagram } = require('../src/components/diagramGenerator');
 
 const { getActiveDocumentFile, selectFileDialog } = require('../src/fallbacks/activeDocument');
-const { analyzeCode, syntaxTreeToJson } = require('../src/utils/codeParser');
 
+const { syntaxTreeToJson } = require("../parsers/utils");
 const { Notify, parseSetup } = require("./vsUtil");
 
 const AIConnection = require("../src/components/AIConnection");
@@ -29,13 +30,9 @@ async function fileAnalysis() {
   const parsedCode = analyzeCode(selectedFile);
   const parsedJson = syntaxTreeToJson(parsedCode);
 
-  Notify.info('CodeXView! Processing......');
+  // Notify.info('CodeXView! Processing......');
 
-  console.log("parsedJson: ", parsedJson);
-
-  //Get information from the parsed code, such as file count and names,
-  //function count and names, and the same for variables, to check results.
-  AIConnection.prompt = readPrompt();
+  AIConnection.setPrompt(readPrompt());
   const diagram = await AIConnection.getChatResponse(parsedJson);
 
   if (!diagram) {
@@ -46,11 +43,11 @@ async function fileAnalysis() {
   // add diagram to project
   console.log("DiagramCode:", diagram);
   const added = await generateCCDiagram(diagram);
-  if (added) {
-    Notify.info('CodeXView! Finnished, Diagram has been added to your project...');
-  } else {
-    Notify.error('CodeXView! Error adding diagram to project...');
+  if (!added) {
+    Notify.error("CodeXView! Error adding diagram to project...");
+    return;
   }
+  Notify.info("CodeXView! Finnished, Diagram has been added to your project...");
 }
 
 module.exports = fileAnalysis;

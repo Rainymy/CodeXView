@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-undef
 const vscode = acquireVsCodeApi();
 const counter = document.getElementById("lines-of-code-counter");
 

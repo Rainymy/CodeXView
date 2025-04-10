@@ -1,6 +1,10 @@
+const AIConnection = require("../src/components/AIConnection");
+
+const { readPrompt } = require("../src/utils/fileHandler");
 const { analyzeCodebase } = require("../src/utils/codebaseParser");
-const { getWorkspaceFolder } = require('../src/fallbacks/activeDocument');
 const { loadIgnoreRules } = require("../src/utils/ignoreRules");
+
+const { getWorkspaceFolder } = require('../src/fallbacks/activeDocument');
 
 const { Notify, parseSetup } = require("./vsUtil");
 
@@ -18,24 +22,28 @@ async function codebaseAnalysis() {
 
   Notify.info("🔍 CodeXView! Found Codebase...");
 
-  try {
-    loadIgnoreRules(); // Temporary placement.
+  loadIgnoreRules(); // Temporary placement.
 
-    const parsedCode = await analyzeCodebase();
+  const parsedCode = await analyzeCodebase();
 
-    if (!parsedCode) {
-      Notify.error("❌ Code parsing failed.");
-      return;
-    }
-
-    console.log("Parsed Code:", parsedCode);
-    // let diagramCode = "";
-
-    // await addDiagramToProject(diagramCode, folder, folderName);
-  } catch (error) {
-    Notify.error(`❌ Error: ${error.message}`);
-    console.error(error);
+  if (!parsedCode && parsedCode.length === 0) {
+    Notify.error("❌ Code parsing failed.");
+    return;
   }
+
+  console.log("Parsed Code:", parsedCode);
+
+  AIConnection.setPrompt(readPrompt());
+
+  const allSyntaxTreeJSON = parsedCode.map(v => v.json);
+  const diagram = await AIConnection.getChatResponse(allSyntaxTreeJSON);
+  console.log("workspace diagram:", diagram);
+
+  if (!diagram) {
+    Notify.error("CodeXView! Error adding diagram to project...")
+    return;
+  }
+  Notify.info("CodeXView! Finnished, Diagram has been added to your project...");
 }
 
 module.exports = codebaseAnalysis;

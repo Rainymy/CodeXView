@@ -69,11 +69,9 @@
   "scripts": {
     "lint": "biome lint .",
     "test": "vscode-test",
-    "vscode:prepublish": "npm run lint && npm run build:pro",
-    "watch:esbuild": "node esbuild.js --watch",
+    "vscode:prepublish": "npm run lint && npm run build",
     "package": "vsce package",
-    "build": "node esbuild.js",
-    "build:pro": "node esbuild.js --production"
+    "build": "node esbuild.js"
   },
   "repository": {
     "type": "git",
@@ -99,11 +97,9 @@
     "@azure/openai": "^2.0.0",
     "fast-glob": "^3.3.3",
     "ignore": "^7.0.3",
-    "jointjs": "^3.7.7",
     "oniguruma-to-es": "^4.1.0",
-    "path-right-join": "^1.0.0",
+    "path-right-join": "^2.0.1",
     "picocolors": "^1.1.1",
-    "viz.js": "^2.1.2",
     "web-tree-sitter": "^0.25.3",
     "yaml": "^2.7.0"
   }

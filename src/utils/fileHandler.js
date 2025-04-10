@@ -28,7 +28,7 @@ function readdirSync(filePath) {
 
 /**
 * @param {String} filePath
-* @returns
+* @returns {Promise<Error|string[]>}
 */
 function readdir(filePath) {
   return new Promise((resolve, reject) => {
@@ -36,7 +36,7 @@ function readdir(filePath) {
       if (error) {
         return reject(error);
       }
-      resolve(data);
+      resolve(data.map(toString));
     })
   });
 }
@@ -51,7 +51,6 @@ function ensureFolderSync(folderPathFs) {
     if (!fs.existsSync(folderPathFs)) {
       fs.mkdirSync(folderPathFs, { recursive: true });
     }
-
     return true;
   }
   catch {
@@ -80,21 +79,23 @@ function customWriteFileSync(filePathFs, data) {
 
 /**
 * @param {String} filePath
-* @returns
+* @returns {Promise<Error|string>}
 */
 function deleteFile(filePath) {
-  return new Promise((resolve) => fs.unlink(filePath, resolve));
+  return new Promise((resolve) => {
+    fs.unlink(filePath, (err) => resolve(err ?? null));
+  });
 }
 
 /**
 * @param {String} filePathFs
-* @returns
+* @returns {Promise<Error|string>}
 */
 function customReadStream(filePathFs) {
   return new Promise((resolve) => {
     let data = "";
     const readStream = fs.createReadStream(filePathFs, { flags: "r" });
-    readStream.on("data", (chunks) => { data += chunks; });
+    readStream.on("data", (chunks) => { data += chunks.toString(); });
     readStream.on("end", () => resolve(data));
     readStream.on("error", () => resolve(null));
   });
@@ -103,7 +104,7 @@ function customReadStream(filePathFs) {
 /**
 * @param {String} filePathFs
 * @param {Object} data
-* @returns
+* @returns {Promise<Error|null>}
 */
 function customWriteStream(filePathFs, data) {
   return new Promise((resolve) => {
@@ -114,7 +115,7 @@ function customWriteStream(filePathFs, data) {
     });
 
     stream.on("finish", () => resolve(null));
-    stream.on("error", resolve);
+    stream.on("error", (err) => resolve(err));
   });
 }
 

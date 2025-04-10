@@ -2,7 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const fast_glob = require("fast-glob");
-const pathRightJoin = require("path-right-join");
+const { joinRight: pathRightJoin } = require("path-right-join");
 
 const { makeHardCopy, safeJoin } = require("./utils");
 const { logAssetTransfare, STATUS_KEY } = require("./assets");

@@ -4,7 +4,7 @@ const { load_parsers } = require("./parsers/loader.js");
 
 const AIConnection = require("./src/components/AIConnection");
 const ProjectConfig = require("./src/components/ProjectConfig");
-const { KeyVault, SECRET_ENUM } = require("./src/components/Keyvault");
+const { KeyVault } = require("./src/components/Keyvault");
 
 const fileAnalysis = require("./commands/file.js");
 const codebaseAnalysis = require("./commands/codebase.js");
@@ -37,12 +37,9 @@ async function activate(context) {
 async function startUp() {
   // access keyvault
   KeyVault.init();
-  AIConnection.apiKey = await KeyVault.getSecret(SECRET_ENUM.KEY);
-  AIConnection.apiUrl = await KeyVault.getSecret(SECRET_ENUM.URL);
-  AIConnection.password = await KeyVault.getSecret(SECRET_ENUM.PASSWORD);
+  await AIConnection.init();
 
   ProjectConfig.load();
-
   await load_parsers();
 }
 

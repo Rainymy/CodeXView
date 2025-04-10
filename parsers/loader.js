@@ -1,22 +1,17 @@
 const path = require("node:path");
-const fs = require("node:fs");
 
 const { Parser, Language } = require("web-tree-sitter");
 const pico = require("picocolors");
 
+const { loadEntry } = require("./utils");
+const { measureTime } = require("./perf_utils");
 const { printFancyTitle } = require("../src/utils/fancyTitle");
 
-/** @type {Entries} */
+/** @type {import('./language').Entries} */
 const entries = require("./entries.json");
-
-/**
- * @typedef {import('./language').LoadEntry} LoadEntry
- * @typedef {import('./language').Entries} Entries
- */
 
 /** @type {Parser} */
 let parser = null;
-let isParsersLoaded = false;
 const lang_parsers = new Map();
 
 async function load_parsers() {
@@ -26,6 +21,7 @@ async function load_parsers() {
   parser = new Parser();
   let duplicates = 0;
 
+  // Make sure there are something to process.
   if (entries.length === 0) {
     console.error(pico.red(" - No Entries Found!"));
   }
@@ -41,7 +37,7 @@ async function load_parsers() {
     }
 
     const entryPath = path.join(__dirname, entry.path);
-    const { entry: config, error } = await loadEntry(entryPath);
+    const [time, { entry: config, error }] = await measureTime(loadEntry(entryPath))
 
     if (error) {
       console.error(pico.red(` - Fail to load: ${entry}`));
@@ -50,34 +46,16 @@ async function load_parsers() {
     }
 
     lang_parsers.set(entry.name, config);
-    console.log(pico.green(` - Entry Loaded: ${pico.cyan(entry.name)}`));
+    console.log(
+      pico.green(` - Entry Loaded: ${pico.cyan(entry.name)}\n`),
+      pico.yellow(`   └ time: ${time}ms`)
+    );
   }
 
-  isParsersLoaded = true;
   console.log(pico.cyan("Finished loading.\n"));
 }
 
-/**
-* @param {String} entryFile
-* @returns {Promise<LoadEntry>}
-*/
-async function loadEntry(entryFile) {
-  try {
-    return { entry: await loadParserWASM(entryFile), error: null };
-  }
-  catch (err) {
-    return { entry: null, error: err };
-  }
-}
-
-/**
-* @param {String} pathFs
-* @returns {Promise<Language>}
-*/
-async function loadParserWASM(pathFs) {
-  const data = new Uint8Array(fs.readFileSync(pathFs));
-  return await Language.load(data);
-}
+const LOAD_PARSERS_FIRST = `Parsers are not loaded! call: ${load_parsers.name}()`;
 
 /**
 * Look up time is O(1).
@@ -85,15 +63,30 @@ async function loadParserWASM(pathFs) {
 * Initialize the parsers, before retrieving.
 * @param {String} language
 * @returns {Language=}
+* @throws if parsers are not loaded yet.
 */
-function getLanguageParser(language) {
-  if (!isParsersLoaded) throw Error("Parsers are not loaded yet!");
+function hasLanguageParser(language) {
+  if (!parser) throw Error(LOAD_PARSERS_FIRST);
   return lang_parsers.get(language?.toLowerCase());
+}
+
+/**
+* Look up time is O(1).
+*
+* Initialize the parsers, before checking.
+* @param {String} language
+* @returns {Boolean}
+* @throws if parsers are not loaded yet.
+*/
+function doesLanguageParserExist(language) {
+  if (!parser) throw Error(LOAD_PARSERS_FIRST);
+  return lang_parsers.has(language?.toLowerCase());
 }
 
 module.exports = {
   getParser: () => parser,
   getLoadedParsers: () => lang_parsers,
-  getLanguageParser: getLanguageParser,
+  getLanguageParser: hasLanguageParser,
+  doesLanguageParserExist: doesLanguageParserExist,
   load_parsers: load_parsers
 }
