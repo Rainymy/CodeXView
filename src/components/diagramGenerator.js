@@ -5,6 +5,10 @@ const { customWriteStream, readdirSync } = require("../utils/fileHandler");
 const ProjectConfig = require("./ProjectConfig");
 const PlantUML = require("./PlantUML_base64");
 
+/**
+* @param {String} diagramCode
+* @returns
+*/
 async function generateCCDiagram(diagramCode) {
   const cleanedOutput = diagramCode.replace(/^```plantuml\s*/i, '').replace(/\s*```$/, '');
 
@@ -21,7 +25,9 @@ async function generateCCDiagram(diagramCode) {
 
     data = Buffer.from(await response.arrayBuffer());
   } catch (error) {
-    console.error(`Network error : ${error.message}`);
+    console.error(
+      `[ ${generateCCDiagram.name} ] Network error : ${error}`
+    );
     return false;
   }
 

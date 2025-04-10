@@ -1,8 +1,8 @@
-const { languages } = require("../../language/provider");
-const { disambiguations } = require("./disambiguations");
-
 const path = require("node:path");
 const { existsSync } = require("./fileHandler");
+
+const { languages } = require("../../language/provider");
+const { disambiguations } = require("./disambiguations");
 
 /**
 * @typedef {object} DetectLanguage
@@ -73,7 +73,7 @@ function getLanguage(filePath) {
   const language = disambiguations(dotExt, filePath);
 
   // No idea how or when {language.language} can be Array or null.
-  return language.language?.toString() ?? "NO NAME LANGUAGE";
+  return language.language?.toString() ?? "<NO NAME LANGUAGE>";
 }
 
 /**
@@ -86,7 +86,6 @@ function filterByProgrammingLanguage(langs) {
 }
 
 /**
-*
 * @param {DetectLanguage[]} langs
 * @returns {SimpleStats}
 */
@@ -102,12 +101,11 @@ function languagesSimpleStat(langs) {
 }
 
 /**
-*
 * @param {DetectLanguage[]} langs
-* @param {String} lng
+* @param {String} language
 */
-function filterByLanguage(langs, lng) {
-  return langs.filter(val => val.language === lng);
+function filterByLanguage(langs, language) {
+  return langs.filter(val => val.language === language);
 }
 
 /**

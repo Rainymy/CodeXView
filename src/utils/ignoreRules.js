@@ -10,12 +10,14 @@ const { printFancyMultilineTitle, printFancyTitle } = require("./fancyTitle");
 const IGNORE_RULES_FILE = ".gitignore";
 const DEFAULT_ADDITIONAL_RULES = [
   // additional rules to ignore.
-  ".git",   // git repo
-  "dist",   // build folder
-  "*.env",  // all environment files.
-  "*.md",   // all markdown files.
-  ".*",     // ALL dot files and folder.
-  "LICENSE",// ignore all LICENSEs
+  "node_modules",  // Node.js packages
+  ".git",          // git repo
+  "dist",          // build folder
+  "*.env",         // all environment files.
+  "*.md",          // all markdown files.
+  "*.ico",         // all icon files.
+  ".*",            // ALL dot files and folder.
+  "LICENSE",       // ignore all LICENSEs
 ];
 
 const COULD_NOT_FIND_IGNORE_RULES = [
@@ -23,12 +25,16 @@ const COULD_NOT_FIND_IGNORE_RULES = [
   `MISSING FILE: ${pico.red(IGNORE_RULES_FILE)}`
 ];
 
+const READING_RULES_FROM_ROOT_DISABLED = pico.yellow(
+  "READING RULES FROM ROOT IS DISABLED."
+);
+
 /** @type {ignore.Ignore} */
 let rules = null;
 
 function loadIgnoreRules() {
   if (!ProjectConfig.readRootIgnoreRules()) {
-    printFancyTitle(pico.yellow("READING RULEs FROM ROOT IS DISABLED."));
+    printFancyTitle(READING_RULES_FROM_ROOT_DISABLED);
     rules = createIgnoreRules([]);
     return;
   }
@@ -66,18 +72,17 @@ function createIgnoreRules(baseRules) {
 */
 function isIgnored(rootFs, filePath) {
   if (rules === null) {
-    throw Error("Initialize the rules first. `loadIgnoreRules()`");
+    throw Error(`Initialize the rules first. "${loadIgnoreRules.name}()"`);
   }
 
   return rules.ignores(path.relative(rootFs, filePath));
 }
 
 /**
-*
-* @param {Boolean} logIgnored write to terminal ignored files/folders.
+* @param {((ignored:string) => void)=} logIgnoredCallback ignored files/folders.
 * @returns
 */
-function loadAllFoldersWithIgnore(logIgnored = true) {
+function loadAllFoldersWithIgnore(logIgnoredCallback) {
   const root = ProjectConfig.getRootFolder();
   const item = [...fs.readdirSync(root)];
   const files = [];
@@ -90,7 +95,7 @@ function loadAllFoldersWithIgnore(logIgnored = true) {
     const absoluteWalk = path.join(root, currentWalk);
 
     if (isIgnored(root, absoluteWalk)) {
-      if (logIgnored) console.log("Ignoring: ", pico.yellow(currentWalk));
+      logIgnoredCallback?.(currentWalk); // call cb if path is being ignored
       continue;
     }
 
@@ -107,15 +112,6 @@ function loadAllFoldersWithIgnore(logIgnored = true) {
 
   return files;
 }
-
-
-// requires root path to be set.
-// ProjectConfig.setRootPath(path.join(__dirname, "../../"));
-
-// loadGitIgnore(); // load ignore rules via root path.
-
-// const folders = loadAllFoldersWithIgnore(); // all not ignored files.
-// console.log(folders);
 
 module.exports = {
   loadAllFoldersWithIgnore: loadAllFoldersWithIgnore,

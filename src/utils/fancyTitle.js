@@ -77,5 +77,6 @@ function clamp(maxv, value, minv) {
 module.exports = {
   centerText: centerText,
   printFancyTitle: printFancyTitle,
-  printFancyMultilineTitle: printFancyMultilineTitle
+  printFancyMultilineTitle: printFancyMultilineTitle,
+  columns: columns
 }

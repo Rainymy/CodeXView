@@ -7,8 +7,6 @@ const { heuristics, convertToJSRegex } = require("../../language/provider");
 */
 
 /**
-* Not Finished, This can handle most of the languages.
-* - check: `toRegex` can't handle PCRE standard!
 * @param {String} ext
 * @param {String} filePath
 * @returns
@@ -30,7 +28,6 @@ function disambiguations(ext, filePath) {
 }
 
 /**
-*
 * @param {RulesEntity} rules
 * @param {String} fileContent
 * @returns {Boolean}
@@ -40,7 +37,6 @@ function parseRules(rules, fileContent) {
     const subRules = rules.and.map(subRule => parseRules(subRule, fileContent));
     return subRules.every(val => val);
   }
-
   if (rules.pattern) {
     return toRegex(rules.pattern).test(fileContent);
   }
@@ -56,7 +52,6 @@ function parseRules(rules, fileContent) {
 }
 
 /**
-*
 * @param {String|String[]} patterns
 * @returns {RegExp}
 */

@@ -18,7 +18,7 @@ function KeyVault() {
   /** @type {SecretClient|null} client */
   let client = null;
 
-  const secretKeys = {
+  const SecretKeys = {
     [SECRET_ENUM.KEY]: "Ai-Key-mini-o1",
     [SECRET_ENUM.URL]: "Ai-url-mini-o1",
     [SECRET_ENUM.PASSWORD]: "SecretApiPassword"
@@ -39,10 +39,10 @@ function KeyVault() {
   */
   this.getSecret = async (key) => {
     if (!client) throw Error("Client not found");
-    if (typeof key !== "string" || !secretKeys[key]) throw Error("Invalid key")
+    if (typeof key !== "string" || !SecretKeys[key]) throw Error("Invalid key")
 
     // getSecret throws if secret not found.
-    const secret = await client.getSecret(secretKeys[key]);
+    const secret = await client.getSecret(SecretKeys[key]);
 
     return secret.value;
   }

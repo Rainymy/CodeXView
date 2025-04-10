@@ -1,46 +1,74 @@
-const { readFileSync } = require("./fileHandler")
+const { readFileSync } = require("./fileHandler");
+const { columns } = require("./fancyTitle");
 
 const {
   filterByProgrammingLanguage,
   filterByLanguage,
   languagesSimpleStat,
   detectLanguagesInFiles
-} = require('../utils/detectLanguage');
+} = require('./detectLanguage');
 const { loadAllFoldersWithIgnore } = require("../utils/ignoreRules");
 
-const { getParser, getLanguageParser } = require("../../parsers/loader");
+const {
+  getParser,
+  getLanguageParser,
+  doesLanguageParserExist
+} = require("../../parsers/loader");
+
+const { syntaxTreeToJson } = require("../../parsers/utils");
+
+const pico = require("picocolors");
 
 /**
 * @typedef {import("./detectLanguage").DetectLanguage} DetectLanguage
+* @typedef {import("../../parsers/utils").SyntaxTreeJSON} SyntaxTreeJSON
+* @typedef {import("web-tree-sitter").Tree} Tree
 */
 
 /**
 * @typedef {object} ParsedFile
 * @property  {String} file - File path
-* @property  {import("web-tree-sitter").Tree?} tree - Parsed syntax tree
+* @property  {Tree?} tree - Parsed syntax tree
+* @property  {SyntaxTreeJSON} json - Parsed JSON syntax tree
 */
 
-// Use github linguest package to identify/analys projact.
+/**
+* @returns {Promise<ParsedFile[]|null>}
+*/
 async function analyzeCodebase() {
-  const allFiles = loadAllFoldersWithIgnore(false);
+  const allFiles = loadAllFoldersWithIgnore(ignoredPath => {
+    console.log(" ├ Ignoring:", pico.yellow(ignoredPath));
+  });
+  console.log(` └${"─".repeat(columns - 2)}`);
 
   const detectedData = detectLanguagesInFiles(allFiles);
-  const sourceFiles = filterByProgrammingLanguage(detectedData.detected);
+  if (detectedData.failed.length) {
+    console.log(pico.magenta("Failed to process files:"));
+    for (const fail of detectedData.failed) {
+      console.log(` ├ ${pico.red(fail.path)}`);
+    }
+    console.log(` └${"─".repeat(columns - 2)}`);
+  }
 
+  const sourceFiles = filterByProgrammingLanguage(detectedData.detected);
   if (sourceFiles.length === 0) {
     console.log("❌ Found No Programming Languages!");
-    return null
-  };
+    return null;
+  }
 
   const langStats = languagesSimpleStat(sourceFiles);
-  const detectedLanguages = langStats.languages.join((" "));
+  const detectedLanguages = langStats.languages.join(" ");
 
   console.log(`- 🔍 Detected languages: [ ${detectedLanguages} ]`);
   console.log(`- 📂 Found ${sourceFiles.length} source files.`);
 
-  /** @type {ParsedFile[]} */
-  const syntaxTrees = langStats.languages.reduce((accum, language) => {
-    accum.push(...parseFilesForLanguage(sourceFiles, language))
+  const syntaxTrees = langStats.languages.reduce((
+      /** @type {ParsedFile[]} */ accum, language
+  ) => {
+    const filesByLanguage = filterByLanguage(sourceFiles, language);
+    const fileLang = filesByLanguage[0].language;
+
+    accum.push(...parseFilesForLanguage(filesByLanguage, fileLang));
     return accum;
   }, []);
 
@@ -53,30 +81,25 @@ async function analyzeCodebase() {
 * @returns {ParsedFile[]}
 */
 function parseFilesForLanguage(sourceFiles, language) {
+  if (!doesLanguageParserExist(language)) {
+    console.warn(`⚠️  No parser available for language: ${language}`);
+    return [];
+  }
+
   const parser = getParser();
-  const filesByLanguage = filterByLanguage(sourceFiles, language);
+  parser.setLanguage(getLanguageParser(language));
 
-  // This should never happen because it's checked/handled earlier.
-  if (filesByLanguage.length === 0) {
-    console.warn("⚠️  Unexpected state: filesByLanguage is empty.");
-    return [];
-  }
+  return filterByLanguage(sourceFiles, language).map(file => {
+    const tree = parser.parse(readFileSync(file.path, "utf8"));
 
-  const fileLanguage = filesByLanguage[0].language;
-  const languageParser = getLanguageParser(fileLanguage);
-  if (!languageParser) {
-    console.warn(`⚠️  No parser available for language: ${fileLanguage}`);
-    return [];
-  }
-
-  parser.setLanguage(languageParser);
-
-  return filesByLanguage.map(file => {
-    return {
+    /** @type {ParsedFile} */
+    const parsedObject = {
       file: file.path,
-      tree: parser.parse(readFileSync(file.path, "utf8"))
-    };
-  })
+      tree: tree,
+      json: syntaxTreeToJson(tree)
+    }
+    return parsedObject;
+  });
 }
 
 module.exports = {

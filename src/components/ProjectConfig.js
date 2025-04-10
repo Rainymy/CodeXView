@@ -1,12 +1,6 @@
 const path = require("node:path");
-const vscode = require("vscode");
-
-/**
-* @typedef {import("vscode").WorkspaceConfiguration} WorkspaceConfiguration
-*/
 
 const { ConfigKeys } = require("../../configKeys");
-
 const { configSetting } = require("../fallbacks/configuration");
 
 function ProjectConfig() {
@@ -18,7 +12,7 @@ function ProjectConfig() {
   let createFile = null;
   /** @type {Boolean} */
   let ignoreRulesFromWorkspace = null;
-  /** @type {WorkspaceConfiguration} */
+  /** @type {import("vscode").WorkspaceConfiguration} */
   let config = null;
   let rootPath = "";
 
