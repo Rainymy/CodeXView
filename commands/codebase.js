@@ -1,3 +1,4 @@
+const { generateCCDiagram } = require("../src/components/diagramGenerator");
 const AIConnection = require("../src/components/AIConnection");
 
 const { readPrompt } = require("../src/utils/fileHandler");
@@ -40,6 +41,14 @@ async function codebaseAnalysis() {
   console.log("workspace diagram:", diagram);
 
   if (!diagram) {
+    Notify.info('CodeXView! Failed to generate Diagram.');
+    return;
+  }
+
+  // add diagram to project
+  console.log("DiagramCode:", diagram);
+  const added = await generateCCDiagram(diagram);
+  if (!added) {
     Notify.error("CodeXView! Error adding diagram to project...")
     return;
   }
