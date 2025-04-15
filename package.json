@@ -67,7 +67,7 @@
     ]
   },
   "scripts": {
-    "lint": "biome lint .",
+    "lint": "npx -y biome lint .",
     "test": "vscode-test",
     "vscode:prepublish": "npm run lint && npm run build",
     "package": "vsce package",
@@ -82,7 +82,6 @@
   },
   "license": "UNLICENSED",
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
     "@types/vscode": "^1.97.0",
