@@ -3,13 +3,12 @@ const path = require("node:path");
 const { readPrompt, customWriteStream } = require('../src/utils/fileHandler');
 const { analyzeCode } = require('../src/utils/codeParser');
 
-const { extractJSONInfo } = require("../src/components/DiagramChecker");
 const { validateAndGetPlantUML, getNextFileName } = require('../src/components/diagramGenerator');
 const AIConnection = require("../src/components/AIConnection");
 
 const { getActiveDocumentFile, selectFileDialog } = require('../src/fallbacks/activeDocument');
 
-const { syntaxTreeToJson } = require("../parsers/utils");
+const { syntaxTreeToJson, extractNodeInfo } = require("../parsers/utils");
 const { Notify, parseSetup } = require("./vsUtil");
 
 async function fileAnalysis() {
@@ -29,7 +28,7 @@ async function fileAnalysis() {
   const parsedCode = analyzeCode(selectedFile);
   const parsedJson = syntaxTreeToJson(parsedCode);
 
-  const diagramObj = await extractJSONInfo(parsedJson);
+  const diagramObj = extractNodeInfo(parsedJson);
 
   Notify.info('CodeXView! Processing......');
 

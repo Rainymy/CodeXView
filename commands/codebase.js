@@ -1,4 +1,4 @@
-const { extractJSONArrayInfo } = require("../src/components/DiagramChecker");
+const { extractNodesInfo } = require("../parsers/utils");
 
 const {
   getNextFileName,
@@ -42,7 +42,7 @@ async function codebaseAnalysis() {
   AIConnection.setPrompt(readPrompt());
 
   const allSyntaxTreeJSON = parsedCode.map((v) => v.json);
-  const diagramObj = await extractJSONArrayInfo(allSyntaxTreeJSON);
+  const diagramObj = extractNodesInfo(allSyntaxTreeJSON);
   console.log("Diagram Object:", diagramObj);
 
   const diagramCode = await validateAndGetPlantUML(diagramObj, allSyntaxTreeJSON)

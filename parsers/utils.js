@@ -18,6 +18,23 @@ const { Language } = require("web-tree-sitter");
 */
 
 /**
+* @typedef {Object} DiagramObjects
+* @property {Number} classCounter
+* @property {String[]} classNames
+*/
+
+/**
+* @param {String[]} classNames
+* @returns {DiagramObjects}
+*/
+function createDiagramObject(classNames) {
+  return {
+    classCounter: classNames.length,
+    classNames: classNames
+  }
+}
+
+/**
 * @param {String} entryFile
 * @returns {Promise<LoadEntry>}
 */
@@ -65,7 +82,42 @@ function syntaxNodeToJson(node) {
   }
 }
 
+/**
+* @param {SyntaxTreeJSON[]} treeArray
+* @returns
+*/
+function extractNodesInfo(treeArray) {
+  const classNames = [];
+
+  /** @param {SyntaxTreeJSON} node */
+  function traverse(node) {
+    // pretty sure this only extract only class names
+    if (node.type === "class_declaration" && node.name) {
+      classNames.push(node.name);
+    }
+    node.children.map(traverse);
+  }
+
+  // Traverse each SyntaxTreeJSON root node in the array
+  for (const syntaxTree of treeArray) {
+    traverse(syntaxTree);
+  }
+
+  return createDiagramObject(classNames);
+}
+
+/**
+* @param {SyntaxTreeJSON} tree
+* @returns
+*/
+function extractNodeInfo(tree) {
+  return extractNodesInfo([tree]);
+}
+
 module.exports = {
+  createDiagramObject: createDiagramObject,
   loadEntry: loadEntry,
-  syntaxTreeToJson: syntaxTreeToJson
+  syntaxTreeToJson: syntaxTreeToJson,
+  extractNodesInfo: extractNodesInfo,
+  extractNodeInfo: extractNodeInfo
 }

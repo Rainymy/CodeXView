@@ -1,5 +1,7 @@
 const zlib = require("node:zlib");
 
+const { createDiagramObject } = require("../../parsers/utils");
+
 /**
 * @param {Number} c
 * @returns
@@ -67,7 +69,25 @@ function generateURL(encodedCode) {
   return `https://www.plantuml.com/plantuml/png/${encodedCode}`;
 }
 
+/**
+ * @param {String} umlString
+ * @returns
+ */
+function extractClassName(umlString) {
+  const classRegex = /^\s*(abstract\s+)?class\s+(\w+)/gm;
+  const classNames = [];
+
+  let match = classRegex.exec(umlString);
+  while (match !== null) {
+    match = classRegex.exec(umlString);
+    classNames.push(match[2]); // match[2] is the class name
+  }
+
+  return createDiagramObject(classNames);
+}
+
 module.exports = {
   encoder: encodePlantUML,
-  generateURL: generateURL
-};
+  generateURL: generateURL,
+  extractClassName: extractClassName
+}

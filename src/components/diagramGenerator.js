@@ -1,17 +1,17 @@
-const AIConnection = require("./AIConnection");
-const { DiagramObjects, compareDiagramObjects, extractClassInfoFromPlantUML } = require("./DiagramChecker");
-
 const path = require("node:path");
+
+const AIConnection = require("./AIConnection");
+const { compareDiagramObjects } = require("./diagramChecker");
 
 const { readdirSync } = require("../utils/fileHandler");
 
 const ProjectConfig = require("./ProjectConfig");
-const PlantUML = require("./PlantUML_base64");
+const PlantUML = require("./PlantUML");
 
 /**
 * This function has builtin retries.
 * @typedef {import("../../parsers/utils").SyntaxTreeJSON} SyntaxTreeJSON
-* @param {DiagramObjects} diagramObj
+* @param {import("../../parsers/utils").DiagramObjects} diagramObj
 * @param {SyntaxTreeJSON|SyntaxTreeJSON[]} allSyntaxTreeJSON
 */
 async function validateAndGetPlantUML(diagramObj, allSyntaxTreeJSON, cb) {
@@ -24,11 +24,11 @@ async function validateAndGetPlantUML(diagramObj, allSyntaxTreeJSON, cb) {
     const diagram = await AIConnection.getChatResponse(allSyntaxTreeJSON);
     console.log("workspace diagram:", diagram);
 
-    const umlObj = await extractClassInfoFromPlantUML(diagram);
+    const umlObj = PlantUML.extractClassName(diagram);
 
     console.log("umlObj:", umlObj);
     const plantUML = await requestPlamtUMLCode(diagram);
-    const matches = await compareDiagramObjects(diagramObj, umlObj);
+    const matches = compareDiagramObjects(diagramObj, umlObj);
 
     if (!plantUML || !matches) {
       console.log(`Attempt ${attempts}: Diagram did not pass validation.`);
