@@ -44,6 +44,7 @@ async function codebaseAnalysis() {
   let validUMLCode = "";
   let isNotCorrect = true;
   let attempts = 0;
+  let valid = false;
   const maxAttempts = 5;
 
   while (isNotCorrect && attempts < maxAttempts) {
@@ -55,7 +56,7 @@ async function codebaseAnalysis() {
     const umlObj = await extractClassInfoFromPlantUML(diagram);
     
     console.log("umlObj:", umlObj);
-    const valid = await isValidPlantUMLCode(diagram);
+    valid = await isValidPlantUMLCode(diagram);
     const matches = await compareDiagramObjects(diagramObj, umlObj);
     
     if (valid && matches) {
@@ -70,10 +71,11 @@ async function codebaseAnalysis() {
     }
   }
 
-  if (!validUMLCode) {
+  if (!valid) {
     Notify.info("CodeXView! Failed to generate Diagram.");
     return;
   }
+
 
   // add diagram to project
   console.log("DiagramCode:", validUMLCode);
