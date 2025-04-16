@@ -13,32 +13,28 @@ const PlantUML = require("./PlantUML");
 * @typedef {import("../../parsers/utils").SyntaxTreeJSON} SyntaxTreeJSON
 * @param {import("../../parsers/utils").DiagramObjects} diagramObj
 * @param {SyntaxTreeJSON|SyntaxTreeJSON[]} allSyntaxTreeJSON
+* @returns {Promise<string|null>}
 */
-async function validateAndGetPlantUML(diagramObj, allSyntaxTreeJSON, cb) {
-  let attempts = 1;
-  const maxAttempts = 5;
+async function validateDiagram(diagramObj, allSyntaxTreeJSON) {
+  const MAX_ATTEMPT = 1;
+  let attempts = 0;
 
-  while (attempts <= maxAttempts) {
+  while (attempts < MAX_ATTEMPT) {
     attempts++;
 
     const diagram = await AIConnection.getChatResponse(allSyntaxTreeJSON);
-    console.log("workspace diagram:", diagram);
+    // console.log("workspace diagram:", diagram);
 
+    // extraction and compare is not working togethor
+    // both works differently
     const umlObj = PlantUML.extractClassName(diagram);
-
-    console.log("umlObj:", umlObj);
-    const plantUML = await requestPlamtUMLCode(diagram);
-    const matches = compareDiagramObjects(diagramObj, umlObj);
-
-    if (!plantUML || !matches) {
-      console.log(`Attempt ${attempts}: Diagram did not pass validation.`);
-      console.log("Valid:", plantUML);
-      console.log("Matches:", matches);
-      console.log("Diagram:", umlObj.classCounter);
-      console.log("Parsed:", diagramObj.classCounter);
+    if (compareDiagramObjects(diagramObj, umlObj)) {
+      return diagram;
     }
 
-    return plantUML;
+    console.log(`Attempt ${attempts}: Diagram did not pass validation.`);
+    console.log("Diagram:", umlObj.classNames);
+    console.log("Parsed:", diagramObj.classNames);
   }
 
   return null;
@@ -59,37 +55,7 @@ function getNextFileName() {
     : path.join(outputFolder, `${projectName}_CCD_Diagram.png`);
 }
 
-/**
- * @param {String} diagramCode
- * @returns {Promise<Buffer|null>}
- */
-async function requestPlamtUMLCode(diagramCode) {
-  const cleanedOutput = diagramCode
-    .replace(/^```plantuml\s*/i, "")
-    .replace(/\s*```$/, "");
-
-  const plantumlUrl = PlantUML.generateURL(PlantUML.encoder(cleanedOutput));
-
-  try {
-    const response = await fetch(plantumlUrl, { method: "GET" });
-
-    // If the server couldn't generate a diagram, it returns a 4xx or 5xx
-    if (!response.ok) {
-      console.error(
-        `[ ${requestPlamtUMLCode.name} ] Response not OK: ${response.statusText}`,
-      );
-      return null;
-    }
-
-    return Buffer.from(await response.arrayBuffer());
-  } catch (error) {
-    console.error(`[ ${requestPlamtUMLCode.name} ] Network error: ${error}`);
-    return null;
-  }
-}
-
 module.exports = {
-  validateAndGetPlantUML: validateAndGetPlantUML,
-  getNextFileName: getNextFileName,
-  requestPlamtUMLCode: requestPlamtUMLCode
+  validateDiagram: validateDiagram,
+  getNextFileName: getNextFileName
 }

@@ -3,7 +3,8 @@ const path = require("node:path");
 const { readPrompt, customWriteStream } = require('../src/utils/fileHandler');
 const { analyzeCode } = require('../src/utils/codeParser');
 
-const { validateAndGetPlantUML, getNextFileName } = require('../src/components/diagramGenerator');
+const { validateDiagram, getNextFileName } = require('../src/components/diagramGenerator');
+const PlantUML = require("../src/components/PlantUML");
 const AIConnection = require("../src/components/AIConnection");
 
 const { getActiveDocumentFile, selectFileDialog } = require('../src/fallbacks/activeDocument');
@@ -25,6 +26,7 @@ async function fileAnalysis() {
     Notify.error("⚠️ Problem with permission!");
     return;
   }
+
   const parsedCode = analyzeCode(selectedFile);
   const parsedJson = syntaxTreeToJson(parsedCode);
 
@@ -33,19 +35,24 @@ async function fileAnalysis() {
   Notify.info('CodeXView! Processing......');
 
   AIConnection.setPrompt(readPrompt());
+  const validDiagram = await validateDiagram(diagramObj, parsedJson);
 
-  const diagramCode = await validateAndGetPlantUML(diagramObj, parsedJson);
-  console.log("DiagramCode:", diagramCode);
+  if (validDiagram === null) {
+    Notify.info("CodeXView! Failed to validate Diagram.");
+    return;
+  }
 
-  if (diagramCode === null) {
+  const diagramImage = await PlantUML.requestPlamtUMLImage(validDiagram);
+
+  if (diagramImage === null) {
     Notify.info("CodeXView! Failed to generate Diagram.");
     return;
   }
 
   const fileName = getNextFileName();
-  const error = await customWriteStream(fileName, diagramCode);
+  const error = await customWriteStream(fileName, diagramImage);
 
-  if (!error) {
+  if (error) {
     console.log(`[ ${fileAnalysis.name} ] ${error}`);
     Notify.error("CodeXView! Error adding diagram to project...");
     return;

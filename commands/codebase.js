@@ -2,8 +2,9 @@ const { extractNodesInfo } = require("../parsers/utils");
 
 const {
   getNextFileName,
-  validateAndGetPlantUML
+  validateDiagram
 } = require("../src/components/diagramGenerator");
+const PlantUML = require("../src/components/PlantUML");
 const AIConnection = require("../src/components/AIConnection");
 
 const { readPrompt, customWriteStream } = require("../src/utils/fileHandler");
@@ -45,18 +46,24 @@ async function codebaseAnalysis() {
   const diagramObj = extractNodesInfo(allSyntaxTreeJSON);
   console.log("Diagram Object:", diagramObj);
 
-  const diagramCode = await validateAndGetPlantUML(diagramObj, allSyntaxTreeJSON)
-  console.log("DiagramCode:", diagramCode);
+  const validDiagram = await validateDiagram(diagramObj, allSyntaxTreeJSON)
 
-  if (diagramCode === null) {
+  if (validDiagram === null) {
+    Notify.info("CodeXView! Failed to validate Diagram.");
+    return;
+  }
+
+  const diagramImage = await PlantUML.requestPlamtUMLImage(validDiagram);
+
+  if (diagramImage === null) {
     Notify.info("CodeXView! Failed to generate Diagram.");
     return;
   }
 
   const fileName = getNextFileName();
-  const error = await customWriteStream(fileName, diagramCode);
+  const error = await customWriteStream(fileName, diagramImage);
 
-  if (!error) {
+  if (error) {
     console.log(`[ ${codebaseAnalysis.name} ] ${error}`);
     Notify.error("CodeXView! Error adding diagram to project...");
     return;
