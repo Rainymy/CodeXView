@@ -1,11 +1,17 @@
-const { generateCCDiagram } = require("../src/components/diagramGenerator");
+const { extractNodesInfo } = require("../parsers/utils");
+
+const {
+  getNextFileName,
+  validateDiagram
+} = require("../src/components/diagramGenerator");
+const PlantUML = require("../src/components/PlantUML");
 const AIConnection = require("../src/components/AIConnection");
 
-const { readPrompt } = require("../src/utils/fileHandler");
+const { readPrompt, customWriteStream } = require("../src/utils/fileHandler");
 const { analyzeCodebase } = require("../src/utils/codebaseParser");
 const { loadIgnoreRules } = require("../src/utils/ignoreRules");
 
-const { getWorkspaceFolder } = require('../src/fallbacks/activeDocument');
+const { getWorkspaceFolder } = require("../src/fallbacks/activeDocument");
 
 const { Notify, parseSetup } = require("./vsUtil");
 
@@ -36,23 +42,34 @@ async function codebaseAnalysis() {
 
   AIConnection.setPrompt(readPrompt());
 
-  const allSyntaxTreeJSON = parsedCode.map(v => v.json);
-  const diagram = await AIConnection.getChatResponse(allSyntaxTreeJSON);
-  console.log("workspace diagram:", diagram);
+  const allSyntaxTreeJSON = parsedCode.map((v) => v.json);
+  const diagramObj = extractNodesInfo(allSyntaxTreeJSON);
+  console.log("Diagram Object:", diagramObj);
 
-  if (!diagram) {
-    Notify.info('CodeXView! Failed to generate Diagram.');
+  const validDiagram = await validateDiagram(diagramObj, allSyntaxTreeJSON)
+
+  if (validDiagram === null) {
+    Notify.info("CodeXView! Failed to validate Diagram.");
     return;
   }
 
-  // add diagram to project
-  console.log("DiagramCode:", diagram);
-  const added = await generateCCDiagram(diagram);
-  if (!added) {
-    Notify.error("CodeXView! Error adding diagram to project...")
+  const diagramImage = await PlantUML.requestPlamtUMLImage(validDiagram);
+
+  if (diagramImage === null) {
+    Notify.info("CodeXView! Failed to generate Diagram.");
     return;
   }
-  Notify.info("CodeXView! Finnished, Diagram has been added to your project...");
+
+  const fileName = getNextFileName();
+  const error = await customWriteStream(fileName, diagramImage);
+
+  if (error) {
+    console.log(`[ ${codebaseAnalysis.name} ] ${error}`);
+    Notify.error("CodeXView! Error adding diagram to project...");
+    return;
+  }
+
+  Notify.info("CodeXView! Finished, Diagram has been added to your project...");
 }
 
 module.exports = codebaseAnalysis;

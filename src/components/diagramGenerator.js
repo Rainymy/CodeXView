@@ -1,57 +1,61 @@
-const path = require('node:path');
+const path = require("node:path");
 
-const { customWriteStream, readdirSync } = require("../utils/fileHandler");
+const AIConnection = require("./AIConnection");
+const { compareDiagramObjects } = require("./diagramChecker");
+
+const { readdirSync } = require("../utils/fileHandler");
 
 const ProjectConfig = require("./ProjectConfig");
-const PlantUML = require("./PlantUML_base64");
+const PlantUML = require("./PlantUML");
 
 /**
-* @param {String} diagramCode
-* @returns
+* This function has builtin retries.
+* @typedef {import("../../parsers/utils").SyntaxTreeJSON} SyntaxTreeJSON
+* @param {import("../../parsers/utils").DiagramObjects} diagramObj
+* @param {SyntaxTreeJSON|SyntaxTreeJSON[]} allSyntaxTreeJSON
+* @returns {Promise<string|null>}
 */
-async function generateCCDiagram(diagramCode) {
-  const cleanedOutput = diagramCode.replace(/^```plantuml\s*/i, '').replace(/\s*```$/, '');
+async function validateDiagram(diagramObj, allSyntaxTreeJSON) {
+  const MAX_ATTEMPT = 1;
+  let attempts = 0;
 
-  const plantumlUrl = PlantUML.generateURL(PlantUML.encoder(cleanedOutput))
+  while (attempts < MAX_ATTEMPT) {
+    attempts++;
 
-  let data;
-  try {
-    // Fetch the PNG from PlantUML
-    const response = await fetch(plantumlUrl, { method: "GET" });
+    const diagram = await AIConnection.getChatResponse(allSyntaxTreeJSON);
+    // console.log("workspace diagram:", diagram);
 
-    if (!response.ok) {
-      return false;
+    // extraction and compare is not working togethor
+    // both works differently
+    const umlObj = PlantUML.extractClassName(diagram);
+    if (compareDiagramObjects(diagramObj, umlObj)) {
+      return diagram;
     }
 
-    data = Buffer.from(await response.arrayBuffer());
-  } catch (error) {
-    console.error(
-      `[ ${generateCCDiagram.name} ] Network error : ${error}`
-    );
-    return false;
+    console.log(`Attempt ${attempts}: Diagram did not pass validation.`);
+    console.log("Diagram:", umlObj.classNames);
+    console.log("Parsed:", diagramObj.classNames);
   }
 
-  // write PNG to file
-  const fileName = getNextFileName();
-  const error = await customWriteStream(fileName, data);
-
-  if (error) {
-    console.error(`Error generating CCD diagram: ${error.message}`);
-    return false;
-  }
-
-  return true;
+  return null;
 }
 
 function getNextFileName() {
   const outputFolder = ProjectConfig.getOutputFolder();
   const projectName = path.basename(ProjectConfig.getRootFolder());
 
-  const pngFiles = readdirSync(outputFolder).filter(file => file.endsWith(".png"));
+  const pngFiles = readdirSync(outputFolder)
+    .filter((file) => file.endsWith(".png"));
 
-  return (pngFiles.length > 0)
-    ? path.join(outputFolder, `${projectName}_CCD_Diagram_v${pngFiles.length + 1}.png`)
+  return pngFiles.length > 0
+    ? path.join(
+      outputFolder,
+      `${projectName}_CCD_Diagram_v${pngFiles.length + 1}.png`,
+    )
     : path.join(outputFolder, `${projectName}_CCD_Diagram.png`);
 }
 
-module.exports = { generateCCDiagram: generateCCDiagram };
+module.exports = {
+  validateDiagram: validateDiagram,
+  getNextFileName: getNextFileName
+}
