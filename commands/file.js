@@ -1,18 +1,16 @@
-const { extractJSONInfo, compareDiagramObjects, extractClassInfoFromPlantUML } = require("../src/components/DiagramChecker");
-
 const path = require("node:path");
 
-const { readPrompt } = require('../src/utils/fileHandler');
+const { readPrompt, customWriteStream } = require('../src/utils/fileHandler');
 const { analyzeCode } = require('../src/utils/codeParser');
 
-const { generateCCDiagram, isValidPlantUMLCode } = require('../src/components/diagramGenerator');
+const { extractJSONInfo } = require("../src/components/DiagramChecker");
+const { validateAndGetPlantUML, getNextFileName } = require('../src/components/diagramGenerator');
+const AIConnection = require("../src/components/AIConnection");
 
 const { getActiveDocumentFile, selectFileDialog } = require('../src/fallbacks/activeDocument');
 
 const { syntaxTreeToJson } = require("../parsers/utils");
 const { Notify, parseSetup } = require("./vsUtil");
-
-const AIConnection = require("../src/components/AIConnection");
 
 async function fileAnalysis() {
   const selectedFile = getActiveDocumentFile() ?? await selectFileDialog();
@@ -30,47 +28,26 @@ async function fileAnalysis() {
   }
   const parsedCode = analyzeCode(selectedFile);
   const parsedJson = syntaxTreeToJson(parsedCode);
- 
+
   const diagramObj = await extractJSONInfo(parsedJson);
-  
+
   Notify.info('CodeXView! Processing......');
 
   AIConnection.setPrompt(readPrompt());
 
-  let validUMLCode = "";
-  let isNotCorrect = true;
-  let attempts = 0;
-  let valid = false;
-  const maxAttempts = 5;
+  const diagramCode = await validateAndGetPlantUML(diagramObj, parsedJson);
+  console.log("DiagramCode:", diagramCode);
 
-  while (isNotCorrect && attempts < maxAttempts) {
-    attempts++;
-
-    const diagram = await AIConnection.getChatResponse(parsedJson);
-    console.log("workspace diagram:", diagram);
-
-    const umlObj = await extractClassInfoFromPlantUML(diagram);
-    valid = await isValidPlantUMLCode(diagram);
-    const matches = await compareDiagramObjects(diagramObj, umlObj);
-
-    if (valid && matches) {
-      isNotCorrect = false;
-      validUMLCode = diagram;
-    } else {
-      console.log(`Attempt ${attempts}: Diagram did not pass validation.`);
-    }
-  }
-
-  if (!valid) {
+  if (diagramCode === null) {
     Notify.info("CodeXView! Failed to generate Diagram.");
     return;
   }
 
-  // add diagram to project
-  console.log("DiagramCode:", validUMLCode);
-  const added = await generateCCDiagram(validUMLCode);
+  const fileName = getNextFileName();
+  const error = await customWriteStream(fileName, diagramCode);
 
-  if (!added) {
+  if (!error) {
+    console.log(`[ ${fileAnalysis.name} ] ${error}`);
     Notify.error("CodeXView! Error adding diagram to project...");
     return;
   }

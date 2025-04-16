@@ -1,17 +1,12 @@
-const {
-  compareDiagramObjects,
-  extractClassInfoFromPlantUML,
-  extractJSONArrayInfo,
-  DiagramObjects,
-} = require("../src/components/DiagramChecker");
+const { extractJSONArrayInfo } = require("../src/components/DiagramChecker");
 
 const {
-  generateCCDiagram,
-  isValidPlantUMLCode,
+  getNextFileName,
+  validateAndGetPlantUML
 } = require("../src/components/diagramGenerator");
 const AIConnection = require("../src/components/AIConnection");
 
-const { readPrompt } = require("../src/utils/fileHandler");
+const { readPrompt, customWriteStream } = require("../src/utils/fileHandler");
 const { analyzeCodebase } = require("../src/utils/codebaseParser");
 const { loadIgnoreRules } = require("../src/utils/ignoreRules");
 
@@ -50,58 +45,24 @@ async function codebaseAnalysis() {
   const diagramObj = await extractJSONArrayInfo(allSyntaxTreeJSON);
   console.log("Diagram Object:", diagramObj);
 
-  const diagramCode = await compareAndRetryIfFail(diagramObj, allSyntaxTreeJSON)
+  const diagramCode = await validateAndGetPlantUML(diagramObj, allSyntaxTreeJSON)
+  console.log("DiagramCode:", diagramCode);
 
   if (diagramCode === null) {
     Notify.info("CodeXView! Failed to generate Diagram.");
     return;
   }
 
-  // add diagram to project
-  console.log("DiagramCode:", diagramCode);
-  const added = await generateCCDiagram(diagramCode);
+  const fileName = getNextFileName();
+  const error = await customWriteStream(fileName, diagramCode);
 
-  if (!added) {
+  if (!error) {
+    console.log(`[ ${codebaseAnalysis.name} ] ${error}`);
     Notify.error("CodeXView! Error adding diagram to project...");
     return;
   }
 
   Notify.info("CodeXView! Finished, Diagram has been added to your project...");
-}
-
-/**
- * @typedef {import("../parsers/utils").SyntaxTreeJSON} SyntaxTreeJSON
- * @param {DiagramObjects} diagramObj
- * @param {SyntaxTreeJSON|SyntaxTreeJSON[]} allSyntaxTreeJSON
- */
-async function compareAndRetryIfFail(diagramObj, allSyntaxTreeJSON) {
-  let attempts = 1;
-  const maxAttempts = 5;
-
-  while (attempts <= maxAttempts) {
-    attempts++;
-
-    const diagram = await AIConnection.getChatResponse(allSyntaxTreeJSON);
-    console.log("workspace diagram:", diagram);
-
-    const umlObj = await extractClassInfoFromPlantUML(diagram);
-
-    console.log("umlObj:", umlObj);
-    const valid = await isValidPlantUMLCode(diagram);
-    const matches = await compareDiagramObjects(diagramObj, umlObj);
-
-    if (!valid || !matches) {
-      console.log(`Attempt ${attempts}: Diagram did not pass validation.`);
-      console.log("Valid:", valid);
-      console.log("Matches:", matches);
-      console.log("Diagram:", umlObj.classCounter);
-      console.log("Parsed:", diagramObj.classCounter);
-    }
-
-    return diagram;
-  }
-
-  return null;
 }
 
 module.exports = codebaseAnalysis;
