@@ -54,4 +54,28 @@ function getNextFileName() {
     : path.join(outputFolder, `${projectName}_CCD_Diagram.png`);
 }
 
-module.exports = { generateCCDiagram: generateCCDiagram };
+async function isValidPlantUMLCode(diagramCode) {
+  const cleanedOutput = diagramCode
+    .replace(/^```plantuml\s*/i, '')
+    .replace(/\s*```$/, '');
+
+  const plantumlUrl = PlantUML.generateURL(PlantUML.encoder(cleanedOutput));
+
+  try {
+    const response = await fetch(plantumlUrl, { method: "GET" });
+
+    // If the server couldn't generate a diagram, it returns a 4xx or 5xx
+    if (!response.ok) {
+      console.error(`[ isValidPlantUMLCode ] Server response not OK: ${response.status}`);
+      return false;
+    }
+
+    // You could even do further checks on content type here if needed
+    return true;
+  } catch (error) {
+    console.error(`[ isValidPlantUMLCode ] Network error: ${error}`);
+    return false;
+  }
+}
+
+module.exports = { generateCCDiagram: generateCCDiagram, isValidPlantUMLCode };
