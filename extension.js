@@ -2,7 +2,7 @@ const vscode = require('vscode');
 
 const { load_parsers } = require("./parsers/loader.js");
 
-const AIConnection = require("./src/components/AIConnection");
+const OpenAIConnection = require("./src/components/OpenAICompletion.js");
 const ProjectConfig = require("./src/components/ProjectConfig");
 const { KeyVault } = require("./src/components/Keyvault");
 
@@ -37,7 +37,7 @@ async function activate(context) {
 async function startUp() {
   // access keyvault
   KeyVault.init();
-  await AIConnection.init();
+  await OpenAIConnection.init();
 
   ProjectConfig.load();
   await load_parsers();

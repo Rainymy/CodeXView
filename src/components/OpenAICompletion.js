@@ -39,14 +39,15 @@ class OpenAICompletion {
 
   /**
   * @typedef {import("../../parsers/utils").SyntaxTreeJSON} SyntaxTreeJSON
-  * @param {SyntaxTreeJSON|SyntaxTreeJSON[]} parsedCode
+  * @param {SyntaxTreeJSON[]} parsedCode
   * @returns {Promise<String|null>}
   */
   async getChatResponse(parsedCode) {
     const generator = new IDGenerator();
-    const parse = this.randomJSFile(); // replace this with `parsedCode`
+    // const parse = [this.randomJSFile()]; // replace this with `parsedCode`
 
-    const chunks = this.#chunkify(depthFirstTree(parse, generator), 200);
+    const chonk = parsedCode.flatMap(v => depthFirstTree(v, generator));
+    const chunks = this.#chunkify(chonk);
 
     const responses = await this.#client.chat.completions.create({
       messages: [
@@ -67,7 +68,6 @@ class OpenAICompletion {
       // number of completion choices to recieve
       n: 1,
       temperature: 0.2,
-      // currently best model: https://openai.com/index/gpt-4-1/
       model: "gpt-4.1-mini"
     });
 
@@ -77,9 +77,10 @@ class OpenAICompletion {
   }
 
   /**
-  * @typedef {import("../../parsers/utils").DepthFirstTree} DepthFirstTree
-  * @param {DepthFirstTree[]} tree
+  * @template T
+  * @param {T[]} tree
   * @param {Number?} chunkSize
+  * @returns {T[][]}
   */
   #chunkify(tree, chunkSize = 100) {
     const chunks = [];
@@ -130,8 +131,7 @@ class OpenAICompletion {
 //   const generator = new IDGenerator();
 //   const ai = new OpenAICompletion();
 //   await ai.init();
-
-//   await ai.getChatResponse({ name: "", type: "", children: [] })
+//   await ai.getChatResponse([]);
 // })();
 
 module.exports = new OpenAICompletion();
