@@ -98,15 +98,15 @@ class OpenAICompletion {
   * @returns
   */
   #toChatParams(item, index, arr) {
-    const partOf = `Part ${index} of ${arr.length}`;
+    const partOf = `Part ${index + 1} of ${arr.length}`;
 
     /** @param {String} str */
-    const codeBlock = (str) => `\`\`\`json\n${str}\`\`\``;
+    const codeBlock = (str) => `\`\`\`json\n${str}\n\`\`\``;
 
     /** @type {ChatCompletionMessageParam} */
     const param = {
       role: "user",
-      content: `${partOf}:\n${codeBlock(JSON.stringify(item))}`
+      content: `${partOf}:\n${codeBlock(JSON.stringify(item, null, 2))}`
     }
     return param;
   }
