@@ -3,6 +3,7 @@ const { Language } = require("web-tree-sitter");
 
 /**
 * @typedef {import("web-tree-sitter").Node} Node
+* @typedef {import("../src/utils/IDGenerator")} IDGenerator
 */
 
 /**
@@ -21,6 +22,14 @@ const { Language } = require("web-tree-sitter");
 * @typedef {Object} DiagramObjects
 * @property {Number} classCounter
 * @property {String[]} classNames
+*/
+
+/**
+* @typedef {Object} DepthFirstTree
+* @property {String} path
+* @property {String} id
+* @property {String?} name
+* @property {String} type
 */
 
 /**
@@ -83,6 +92,34 @@ function syntaxNodeToJson(node) {
 }
 
 /**
+*
+* @param {SyntaxTreeJSON} node
+* @param {IDGenerator} idGenerator
+* @param {String?} parentPath
+* @returns {DepthFirstTree[]}
+*/
+function depthFirstTree(node, idGenerator, parentPath = null) {
+  const id = idGenerator.generate();
+  /** @type {DepthFirstTree[]} */
+  const result = [
+    {
+      path: parentPath ?? "",
+      id: id,
+      name: node.name,
+      type: node.type
+    }
+  ];
+
+  const path = parentPath ? `${parentPath} > ${id}` : id;
+  for (const child of node.children) {
+    result.push(...depthFirstTree(child, idGenerator, path));
+  }
+
+  return result;
+
+}
+
+/**
 * @param {SyntaxTreeJSON[]} treeArray
 * @returns
 */
@@ -117,6 +154,7 @@ function extractNodeInfo(tree) {
 module.exports = {
   createDiagramObject: createDiagramObject,
   loadEntry: loadEntry,
+  depthFirstTree: depthFirstTree,
   syntaxTreeToJson: syntaxTreeToJson,
   extractNodesInfo: extractNodesInfo,
   extractNodeInfo: extractNodeInfo
