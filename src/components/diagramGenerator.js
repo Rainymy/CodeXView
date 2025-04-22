@@ -1,22 +1,24 @@
 const path = require("node:path");
 const fs = require("node:fs");
 
-const OpenAIConnection = require("./OpenAICompletion");
 const { compareDiagramObjects } = require("./diagramChecker");
+const { extractNodesInfo } = require("../../parsers/utils");
 
+const OpenAIConnection = require("./OpenAICompletion");
 const ProjectConfig = require("./ProjectConfig");
 const PlantUML = require("./PlantUML");
 
 /**
 * This function has builtin retries.
 * @typedef {import("../../parsers/utils").SyntaxTreeJSON} SyntaxTreeJSON
-* @param {import("../../parsers/utils").DiagramObjects} diagramObj
 * @param {SyntaxTreeJSON[]} syntaxTree
 * @returns {Promise<string|null>}
 */
-async function validateDiagram(diagramObj, syntaxTree) {
-  const MAX_ATTEMPT = 1;
+async function validateDiagram(syntaxTree) {
+  const MAX_ATTEMPT = 3;
   let attempts = 0;
+
+  const diagramObj = extractNodesInfo(syntaxTree);
 
   while (attempts < MAX_ATTEMPT) {
     attempts++;

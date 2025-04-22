@@ -1,15 +1,14 @@
 const path = require("node:path");
 
-const { readPrompt, customWriteStream } = require('../src/utils/fileHandler');
+const { customWriteStream } = require('../src/utils/fileHandler');
 const { analyzeCode } = require('../src/utils/codeParser');
 
 const { validateDiagram, getNextFileName } = require('../src/components/diagramGenerator');
 const PlantUML = require("../src/components/PlantUML");
-const AIConnection = require("../src/components/AIConnection");
 
 const { getActiveDocumentFile, selectFileDialog } = require('../src/fallbacks/activeDocument');
 
-const { syntaxTreeToJson, extractNodeInfo } = require("../parsers/utils");
+const { syntaxTreeToJson } = require("../parsers/utils");
 const { Notify, parseSetup } = require("./vsUtil");
 
 async function fileAnalysis() {
@@ -27,15 +26,10 @@ async function fileAnalysis() {
     return;
   }
 
-  const parsedCode = analyzeCode(selectedFile);
-  const parsedJson = syntaxTreeToJson(parsedCode);
-
-  const diagramObj = extractNodeInfo(parsedJson);
-
   Notify.info('CodeXView! Processing......');
 
-  AIConnection.setPrompt(readPrompt());
-  const validDiagram = await validateDiagram(diagramObj, parsedJson);
+  const parsedJson = syntaxTreeToJson(analyzeCode(selectedFile));
+  const validDiagram = await validateDiagram([parsedJson]);
 
   if (validDiagram === null) {
     Notify.info("CodeXView! Failed to validate Diagram.");
