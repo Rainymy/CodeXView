@@ -120,12 +120,12 @@ function customWriteStream(filePathFs, data) {
 }
 
 function readCCDExample() {
-  const ccd_example_txt = path.join(__dirname, "ccd-example.txt");
+  const ccd_example_txt = path.join(__dirname, "../prompts/ccd-example.txt");
   return fs.readFileSync(ccd_example_txt, "utf8");
 }
 
 function readPrompt() {
-  const prompt = path.join(__dirname, "prompt.txt");
+  const prompt = path.join(__dirname, "../prompts/prompt.txt");
   return fs.readFileSync(prompt, "utf8");
 }
 

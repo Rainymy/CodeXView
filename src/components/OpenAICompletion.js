@@ -62,17 +62,17 @@ class OpenAICompletion {
 
   /**
   * this is `AST`, pre parsed file (random js file)
-  * @returns
+  * @returns {SyntaxTreeJSON}
   */
   #randomJSFile() {
     return fs.readFileSync(path.join(__dirname, "./temp.txt"), "utf8")
+  readASTPrompt() {
+    const filePath = path.join(__dirname, "../prompts/AST-prompt.txt");
+    return fs.readFileSync(filePath, "utf8");
   }
 }
 
 // (async () => {
-//   const a = new OpenAICompletion();
-//   await a.init();
-//   a.getChatResponse();
 // })();
 
 module.exports = new OpenAICompletion();
