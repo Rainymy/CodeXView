@@ -78,18 +78,62 @@ function generateURL(encodedCode) {
  * @returns
  */
 function extractClassName(umlString) {
-  const classRegex = /^\s*(abstract\s+)?class\s+(\w+)/gm;
+  const classRegex = /^\s*(?:abstract\s+)?class\s+(\w+)/gm;
   const classNames = [];
 
-  // this is not going to work
-  const match = classRegex.exec(umlString);
+  let match = classRegex.exec(umlString);
+
   while (match !== null) {
-    classNames.push(match[2]); // match[2] is the class name
-    break; // stop infinite loop
+    classNames.push(match[1]);
+    match = classRegex.exec(umlString);
   }
 
   return createDiagramObject(classNames);
 }
+
+/**
+ * @param {String} diagramCode   PlantUML source (may be fenced in ```plantuml…```)
+ * @returns {Promise<boolean>}   true if valid UML, false if syntax/server error
+ */
+async function validatePlantUML(diagramCode) {
+  // 1) strip Markdown fences
+  const cleaned = diagramCode
+    .replace(/^```plantuml\s*/i, "")
+    .replace(/\s*```$/, "");
+
+  // 2) encode just like your image request
+  const encoded = encodePlantUML(cleaned);
+
+  // 3) build the URL and switch the 'png' endpoint to 'txt'
+  const imageUrl      = generateURL(encoded);
+  const validationUrl = imageUrl.replace(/\/png\//, "/txt/");
+
+  try {
+    const res = await fetch(validationUrl, { method: "GET" });
+
+    // non‑2xx → PlantUML definitely hit an error
+    if (!res.ok) {
+      console.error(
+        `[validatePlantUML] server returned ${res.status} ${res.statusText}`
+      );
+      return false;
+    }
+
+    // 4) read the text response; PlantUML puts errors right into the body
+    const body = await res.text();
+    if (/error/i.test(body)) {
+      console.error(`[validatePlantUML] syntax error:\n${body}`);
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    console.error("[validatePlantUML] network or unexpected error:", e);
+    return false;
+  }
+}
+
+
 
 /**
  * @param {String} diagramCode
@@ -123,4 +167,5 @@ async function requestPlamtUMLImage(diagramCode) {
 module.exports = {
   extractClassName: extractClassName,
   requestPlamtUMLImage: requestPlamtUMLImage,
+  validatePlantUML: validatePlantUML
 };

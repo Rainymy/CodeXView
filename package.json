@@ -34,7 +34,7 @@
         "title": "CodeXView: Create Webview Test"
       },
       {
-        "command": "codexview.newdiagramtest",
+        "command": "codexview.diagramtest",
         "title": "CodeXView: Test New Diagram"
       }
     ],
