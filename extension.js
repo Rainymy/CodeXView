@@ -9,7 +9,7 @@ const { KeyVault } = require("./src/components/Keyvault");
 const fileAnalysis = require("./commands/file.js");
 const codebaseAnalysis = require("./commands/codebase.js");
 const { createWebview } = require("./commands/webview.js");
-const newDiagram = require("./commands/newdiagram.js");
+const diagramTesting = require("./commands/TestFile.js");
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -22,7 +22,7 @@ async function activate(context) {
   const disposable = register('codexview.file', fileAnalysis);
   const disposable2 = register("codexview.codebase", codebaseAnalysis);
   const disposable3 = register("codexview.webview", createWebview);
-  const disposable4 = register("codexview.newdiagramtest", newDiagram);
+  const disposable4 = register("codexview.diagramtest", diagramTesting);
 
   const allDisposables = [
     disposable, disposable2, disposable3, disposable4

@@ -16,22 +16,19 @@ const PlantUML = require("./PlantUML");
 * @returns {Promise<string|null>}
 */
 async function validateDiagram(diagramObj, allSyntaxTreeJSON) {
-  const MAX_ATTEMPT = 1;
+  const MAX_ATTEMPT = 5;
   let attempts = 0;
 
   while (attempts < MAX_ATTEMPT) {
     attempts++;
 
     const diagram = await AIConnection.getChatResponse(allSyntaxTreeJSON);
-    // console.log("workspace diagram:", diagram);
-
-    // extraction and compare is not working togethor
-    // both works differently
     const umlObj = PlantUML.extractClassName(diagram);
-    if (compareDiagramObjects(diagramObj, umlObj)) {
+    const IsValidDiagramCode = await PlantUML.validatePlantUML(diagram);
+    if (compareDiagramObjects(diagramObj, umlObj) && IsValidDiagramCode) {
       return diagram;
     }
-
+    
     console.log(`Attempt ${attempts}: Diagram did not pass validation.`);
     console.log("Diagram:", umlObj.classNames);
     console.log("Parsed:", diagramObj.classNames);
