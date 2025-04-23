@@ -1,5 +1,5 @@
 const path = require("node:path");
-const { existsSync } = require("./fileHandler");
+const fs = require("node:fs");
 
 const { languages } = require("../../language/provider");
 const { disambiguations } = require("./disambiguations");
@@ -23,7 +23,7 @@ const { disambiguations } = require("./disambiguations");
 * @returns {DetectLanguage}
 */
 function detectLanguageByPath(filePath) {
-  if (!existsSync(filePath)) {
+  if (!fs.existsSync(filePath)) {
     return detectedLanguage(null, filePath, "File does not exist.");
   }
 

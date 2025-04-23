@@ -1,10 +1,13 @@
 const vscode = require('vscode');
 
 const { load_parsers } = require("./parsers/loader.js");
+const { measureTime } = require("./parsers/perf_utils.js");
 
-const AIConnection = require("./src/components/AIConnection");
+const OpenAIConnection = require("./src/components/OpenAICompletion.js");
 const ProjectConfig = require("./src/components/ProjectConfig");
 const { KeyVault } = require("./src/components/Keyvault");
+
+const { printFancyMultilineTitle } = require("./src/utils/fancyTitle.js");
 
 const fileAnalysis = require("./commands/file.js");
 const codebaseAnalysis = require("./commands/codebase.js");
@@ -15,7 +18,8 @@ const newDiagram = require("./commands/newdiagram.js");
  * @param {vscode.ExtensionContext} context
  */
 async function activate(context) {
-  await startUp();
+  const infos = await startUp();
+  printFancyMultilineTitle(["Extension READY", "", ...infos]);
 
   const register = vscode.commands.registerCommand;
 
@@ -35,12 +39,19 @@ async function activate(context) {
 * this function runs once.
 */
 async function startUp() {
+  const timeInfos = [];
   // access keyvault
   KeyVault.init();
-  await AIConnection.init();
+
+  const [timeAI] = await measureTime(OpenAIConnection.init());
+  timeInfos.push(`[ AI Connection ]: ${timeAI}ms`);
 
   ProjectConfig.load();
-  await load_parsers();
+
+  const [timeParsers] = await measureTime(load_parsers());
+  timeInfos.push(`[ Load parsers ]: ${timeParsers}ms`);
+
+  return timeInfos;
 }
 
 // This method is called when your extension is deactivated

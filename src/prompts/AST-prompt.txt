@@ -1,0 +1,9 @@
+You will receive a large tree structure as a sequence of JSON array chunks.
+
+Each element has:
+- "path": a string showing the full path in the tree.
+- "name": the node name.
+- "id": the node ID.
+- "type": Tree-sitter grammer type at that node.
+
+Please remember each chunk as part of a larger structure.

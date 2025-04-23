@@ -1,28 +1,29 @@
 const path = require("node:path");
+const fs = require("node:fs");
 
-const AIConnection = require("./AIConnection");
 const { compareDiagramObjects } = require("./diagramChecker");
+const { extractNodesInfo } = require("../../parsers/utils");
 
-const { readdirSync } = require("../utils/fileHandler");
-
+const OpenAIConnection = require("./OpenAICompletion");
 const ProjectConfig = require("./ProjectConfig");
 const PlantUML = require("./PlantUML");
 
 /**
 * This function has builtin retries.
 * @typedef {import("../../parsers/utils").SyntaxTreeJSON} SyntaxTreeJSON
-* @param {import("../../parsers/utils").DiagramObjects} diagramObj
-* @param {SyntaxTreeJSON|SyntaxTreeJSON[]} allSyntaxTreeJSON
+* @param {SyntaxTreeJSON[]} syntaxTree
 * @returns {Promise<string|null>}
 */
-async function validateDiagram(diagramObj, allSyntaxTreeJSON) {
-  const MAX_ATTEMPT = 1;
+async function validateDiagram(syntaxTree) {
+  const MAX_ATTEMPT = 3;
   let attempts = 0;
+
+  const diagramObj = extractNodesInfo(syntaxTree);
 
   while (attempts < MAX_ATTEMPT) {
     attempts++;
 
-    const diagram = await AIConnection.getChatResponse(allSyntaxTreeJSON);
+    const diagram = await OpenAIConnection.getChatResponse(syntaxTree);
     // console.log("workspace diagram:", diagram);
 
     // extraction and compare is not working togethor
@@ -44,7 +45,7 @@ function getNextFileName() {
   const outputFolder = ProjectConfig.getOutputFolder();
   const projectName = path.basename(ProjectConfig.getRootFolder());
 
-  const pngFiles = readdirSync(outputFolder)
+  const pngFiles = fs.readdirSync(outputFolder)
     .filter((file) => file.endsWith(".png"));
 
   return pngFiles.length > 0

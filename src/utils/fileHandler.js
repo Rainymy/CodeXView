@@ -2,31 +2,6 @@ const fs = require("node:fs");
 const path = require('node:path');
 
 /**
-* @param {String} filePathFs
-* @param {BufferEncoding=} encoding
-* @returns
-*/
-function readFileSync(filePathFs, encoding) {
-  return fs.readFileSync(filePathFs, encoding);
-}
-
-/**
-* @param {String} filePathFs
-* @returns
-*/
-function existsSync(filePathFs) {
-  return fs.existsSync(filePathFs);
-}
-
-/**
-* @param {String} filePath
-* @returns
-*/
-function readdirSync(filePath) {
-  return fs.readdirSync(filePath);
-}
-
-/**
 * @param {String} filePath
 * @returns {Promise<Error|string[]>}
 */
@@ -59,25 +34,6 @@ function ensureFolderSync(folderPathFs) {
 }
 
 /**
-* @param {String} filePathFs
-* @param {object} data
-* @returns
-*/
-function customWriteJSONFileSync(filePathFs, data) {
-  // pretty stringify JSON
-  return fs.writeFileSync(filePathFs, JSON.stringify(data, null, 4));
-}
-
-/**
-* @param {String} filePathFs
-* @param {Object} data
-* @returns
-*/
-function customWriteFileSync(filePathFs, data) {
-  return fs.writeFileSync(filePathFs, JSON.stringify(data));
-}
-
-/**
 * @param {String} filePath
 * @returns {Promise<Error|string>}
 */
@@ -89,14 +45,14 @@ function deleteFile(filePath) {
 
 /**
 * @param {String} filePathFs
-* @returns {Promise<Error|string>}
+* @returns {Promise<Error|Buffer>}
 */
 function customReadStream(filePathFs) {
   return new Promise((resolve) => {
-    let data = "";
+    /** @type {Buffer[]} */ const data = [];
     const readStream = fs.createReadStream(filePathFs, { flags: "r" });
-    readStream.on("data", (chunks) => { data += chunks.toString(); });
-    readStream.on("end", () => resolve(data));
+    readStream.on("data", (chunks) => { data.push(Buffer.from(chunks)) });
+    readStream.on("end", () => resolve(Buffer.concat(data)));
     readStream.on("error", () => resolve(null));
   });
 }
@@ -120,23 +76,18 @@ function customWriteStream(filePathFs, data) {
 }
 
 function readCCDExample() {
-  const ccd_example_txt = path.join(__dirname, "ccd-example.txt");
+  const ccd_example_txt = path.join(__dirname, "../prompts/ccd-example.txt");
   return fs.readFileSync(ccd_example_txt, "utf8");
 }
 
 function readPrompt() {
-  const prompt = path.join(__dirname, "prompt.txt");
+  const prompt = path.join(__dirname, "../prompts/prompt.txt");
   return fs.readFileSync(prompt, "utf8");
 }
 
 module.exports = {
-  readFileSync: readFileSync,
-  existsSync: existsSync,
   readdir: readdir,
-  readdirSync: readdirSync,
   ensureFolderSync: ensureFolderSync,
-  writeJSONFileSync: customWriteJSONFileSync,
-  writeFileSync: customWriteFileSync,
   deleteFile: deleteFile,
   customReadStream: customReadStream,
   customWriteStream: customWriteStream,
