@@ -1,4 +1,4 @@
-const { readFileSync } = require("./fileHandler");
+const fs = require("node:fs")
 
 const { heuristics, convertToJSRegex } = require("../../language/provider");
 
@@ -12,7 +12,7 @@ const { heuristics, convertToJSRegex } = require("../../language/provider");
 * @returns
 */
 function disambiguations(ext, filePath) {
-  const fileContent = readFileSync(filePath, "utf8");
+  const fileContent = fs.readFileSync(filePath, "utf8");
 
   for (const disambiguation of heuristics.disambiguations) {
     if (!disambiguation.extensions.includes(ext)) { continue; }
