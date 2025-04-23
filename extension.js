@@ -12,7 +12,7 @@ const { printFancyMultilineTitle } = require("./src/utils/fancyTitle.js");
 const fileAnalysis = require("./commands/file.js");
 const codebaseAnalysis = require("./commands/codebase.js");
 const { createWebview } = require("./commands/webview.js");
-const diagramTesting = require("./commands/TestFile.js");
+const diagramTesting = require("./commands/testFile.js");
 
 /**
  * @param {vscode.ExtensionContext} context

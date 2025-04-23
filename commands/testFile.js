@@ -4,15 +4,15 @@ const { readPrompt, customWriteStream } = require("../src/utils/fileHandler");
 const { analyzeCode } = require("../src/utils/codeParser");
 
 const {
-	validateDiagram,
-	getNextFileName,
+  validateDiagram,
+  getNextFileName,
 } = require("../src/components/diagramGenerator");
 const PlantUML = require("../src/components/PlantUML");
 const AIConnection = require("../src/components/AIConnection");
 
 const {
-	getActiveDocumentFile,
-	selectFileDialog,
+  getActiveDocumentFile,
+  selectFileDialog,
 } = require("../src/fallbacks/activeDocument");
 
 const { syntaxTreeToJson, extractNodeInfo } = require("../parsers/utils");
@@ -42,12 +42,11 @@ async function diagramTesting() {
     // Re-parse/convert on each run
     const parsedCode = analyzeCode(selectedFile);
     const parsedJson = syntaxTreeToJson(parsedCode);
-    const diagramObj = extractNodeInfo(parsedJson);
 
     // 1) Validate the diagram
     let validDiagram;
     try {
-      validDiagram = await validateDiagram(diagramObj, parsedJson);
+      validDiagram = await validateDiagram([parsedJson]);
     } catch (err) {
       failCount++;
       console.error(`[diagramTesting] Run ${i} — validation threw: ${err.message}`);
