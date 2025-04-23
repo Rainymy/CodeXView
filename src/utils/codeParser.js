@@ -1,4 +1,4 @@
-const { readFileSync } = require("./fileHandler");
+const fs = require("node:fs");
 const { detectLanguageByPath } = require("./detectLanguage");
 
 const {
@@ -27,7 +27,7 @@ function analyzeCode(filePath) {
   const parser = getParser();
   parser.setLanguage(getLanguageParser(language));
 
-  return parser.parse(readFileSync(path, "utf8"));
+  return parser.parse(fs.readFileSync(path, "utf8"));
 }
 
 module.exports = {

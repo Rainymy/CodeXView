@@ -4,7 +4,9 @@ const { DefaultAzureCredential } = require("@azure/identity");
 const SECRET_ENUM = {
   KEY: "KEY",
   URL: "URL",
-  PASSWORD: "PASSWORD"
+  PASSWORD: "PASSWORD",
+  OPENAI: "AzureOpenAI",
+  MODEL_DEV_NAME: "ModelDevelopmentName"
 }
 
 /**
@@ -21,7 +23,9 @@ function KeyVault() {
   const SecretKeys = {
     [SECRET_ENUM.KEY]: "Ai-Key-mini-o1",
     [SECRET_ENUM.URL]: "Ai-url-mini-o1",
-    [SECRET_ENUM.PASSWORD]: "SecretApiPassword"
+    [SECRET_ENUM.PASSWORD]: "SecretApiPassword",
+    [SECRET_ENUM.OPENAI]: "AzureOpenAIUrl",
+    [SECRET_ENUM.MODEL_DEV_NAME]: "DevelopmentModelName"
   };
 
   /**

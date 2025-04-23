@@ -1,4 +1,4 @@
-const { readFileSync } = require("./fileHandler");
+const fs = require("node:fs");
 const { columns } = require("./fancyTitle");
 
 const {
@@ -90,7 +90,7 @@ function parseFilesForLanguage(sourceFiles, language) {
   parser.setLanguage(getLanguageParser(language));
 
   return filterByLanguage(sourceFiles, language).map(file => {
-    const tree = parser.parse(readFileSync(file.path, "utf8"));
+    const tree = parser.parse(fs.readFileSync(file.path, "utf8"));
 
     /** @type {ParsedFile} */
     const parsedObject = {
