@@ -4,7 +4,8 @@ const fs = require("node:fs");
 const { compareDiagramObjects } = require("./diagramChecker");
 const { extractNodesInfo } = require("../../parsers/utils");
 
-const OpenAIConnection = require("./OpenAICompletion");
+//const OpenAIConnection = require("./OpenAICompletion");
+const AIConnection = require("./AIConnection");
 const ProjectConfig = require("./ProjectConfig");
 const PlantUML = require("./PlantUML");
 
@@ -26,21 +27,13 @@ async function validateDiagram(syntaxTree) {
   
     //connection to o1 Model
     //const diagram = await AIConnection.getChatResponse(allSyntaxTreeJSON);
-    const diagram = await OpenAIConnection.getChatResponse(syntaxTree);
+    const diagram = await AIConnection.getChatResponse(syntaxTree);
     // console.log("workspace diagram:", diagram);
 
-    // extraction and compare is not working togethor
-    // both works differently
-
-    const umlObj = PlantUML.extractClassName(diagram);
     const IsValidDiagramCode = await PlantUML.validatePlantUML(diagram);
-    if (compareDiagramObjects(diagramObj, umlObj) && IsValidDiagramCode) {
+    if (IsValidDiagramCode) {
       return diagram;
     }
-    
-    console.log(`Attempt ${attempts}: Diagram did not pass validation.`);
-    console.log("Diagram:", umlObj.classNames);
-    console.log("Parsed:", diagramObj.classNames);
   }
 
   return null;

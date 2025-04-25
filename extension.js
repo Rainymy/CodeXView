@@ -4,6 +4,7 @@ const { load_parsers } = require("./parsers/loader.js");
 const { measureTime } = require("./parsers/perf_utils.js");
 
 const OpenAIConnection = require("./src/components/OpenAICompletion.js");
+const AIConnection = require("./src/components/AIConnection.js");
 const ProjectConfig = require("./src/components/ProjectConfig");
 const { KeyVault } = require("./src/components/Keyvault");
 
@@ -43,7 +44,8 @@ async function startUp() {
   // access keyvault
   KeyVault.init();
 
-  const [timeAI] = await measureTime(OpenAIConnection.init());
+  //const [timeAI] = await measureTime(OpenAIConnection.init());
+  const [timeAI] = await measureTime(AIConnection.init());
   timeInfos.push(`[ AI Connection ]: ${timeAI}ms`);
 
   ProjectConfig.load();
