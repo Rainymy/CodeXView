@@ -11,20 +11,28 @@ async function validateDiagram(summaryJson) {
   const MAX_ATTEMPT = 3;
   let attempts = 0;
 
+  let feedback = null;
+
   while (attempts < MAX_ATTEMPT) {
     attempts++;
-  
-    const diagram = await AIConnection.getChatResponse(summaryJson);
-    console.log("Diagram: ", diagram);
 
-    const IsValidDiagramCode = await PlantUML.validatePlantUML(diagram);
+    const diagram = await AIConnection.getChatResponse(summaryJson, feedback);
+    console.log(`Attempt ${attempts} - Diagram:\n`, diagram);
+
+    const isValid = await PlantUML.validatePlantUML(diagram);
     const relationPattern = /(-->|<--|<->|--|==|\.{1,2}>|<\.{1,2})/;
     const hasRelation = relationPattern.test(diagram);
 
-    if (IsValidDiagramCode && hasRelation) {
+    if (isValid && hasRelation) {
       return diagram;
     }
-    
+
+    // Build feedback to improve the next attempt
+    if (!hasRelation) {
+      feedback = "The diagram is missing relationships (arrows) between classes based on the message data. Please include them.";
+    } else if (!isValid) {
+      feedback = "The PlantUML diagram is not valid. Please fix the syntax.";
+    }
   }
   return null;
 }

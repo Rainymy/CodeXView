@@ -37,29 +37,32 @@ class OpenAICompletion {
     });
   }
 
-  /**
-
+/**
  * Build prompt + call o3 using the slim summary.
  * @param {object} summary  // the object printed as “Slim JSON”
  * @returns {Promise<string|null>}
  */
-  async getChatResponse(summary) {
+  async getChatResponse(summary, feedback = null) {
     const generator = new IDGenerator();
     // const parse = [this.randomJSFile()]; // replace this with `parsedCode`
 
     const basePrompt = readPrompt();      // file contains {{PUT-THE-REAL-SUMMARY-JSON-HERE}}
     
     // 2) inject the summary JSON
-    const prompt = basePrompt.replace(
+    let prompt = basePrompt.replace(
       "{{PUT-THE-REAL-SUMMARY-JSON-HERE}}",
       JSON.stringify(summary, null, 2)
     );
-
+    if (feedback) {
+      prompt += `\n\nNote: ${feedback}`;
+    }
+    console.log("feedback", feedback);
+    console.log("Prompt:\n", prompt);
   // 3) single-message chat call
   const completion = await this.#client.chat.completions.create({
     messages: [{ role: "system", content: prompt }],
     model: "o3",
-    temperature: 0.3,
+    temperature: 0.2,
     n: 1
   });
 
