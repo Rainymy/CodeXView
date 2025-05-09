@@ -1,3 +1,78 @@
-You are an expert in generating Class Collaboration Diagrams using plantuml.
-In the following message, you will receive instructions on how to analyze the input and generate the corresponding diagram.
-Please return only valid plantuml code as output.
+You are given a pre-processed JSON summary of source code:
+
+{
+  "classes"      : ["…"],                 // every class name
+  "associations" : [{ "owner":"…", "field":"…", "type":"…" }],
+  "messages"     : [{ "caller":"…", "callee":"…", "verb":"…" }],
+  "creations"    : [{ "creator":"…", "created":"…" }]
+}
+Important: Relationships (arrows between classes) are a crucial part of the diagram—don’t forget to include them wherever applicable. Each valid message in the messages list should result in a visible arrow in the diagram.
+
+Your task is to create a clean Class Collaboration Diagram in PlantUML code that shows only runtime collaboration between classes.
+
+Rules  
+* Draw every item in **classes** once.  
+  • Use `object ClassName` for normal classes.  
+  • Use `usecase "ClassName" as Alias <<state>>` for classes whose name ends in `State` **or** are the `type` target of an association where `field` is `_state`.  
+* One arrow per unique tuple (caller, callee, verb) found in **messages**.  
+  • Format: `Caller --> Callee : verb()`  
+  • Ignore any tuple where `verb` is `WriteLine`, `log`, or starts with `Log`.  
+  • Ignore self calls where caller equals callee.  
+* Ignore everything else (associations, creations, private-field details).  
+* Apply **exactly** this header and footer:
+
+@startuml
+skinparam object {
+  BackgroundColor White
+  BorderColor Black
+}
+allow_mixing
+hide members
+
+skinparam object<<state>> {
+  BackgroundColor LightBlue
+  BorderColor Blue
+  RoundCorner 25
+}
+
+…your objects and arrows here…
+
+@enduml
+
+Example input → output
+
+Input JSON
+{
+  "classes":["App","Service","TaskState"],
+  "messages":[
+    {"caller":"App","callee":"Service","verb":"run"},
+    {"caller":"Service","callee":"TaskState","verb":"enter"}
+  ]
+}
+
+Expected PlantUML
+@startuml
+skinparam object {
+  BackgroundColor White
+  BorderColor Black
+}
+allow_mixing
+hide members
+
+skinparam object<<state>> {
+  BackgroundColor LightBlue
+  BorderColor Blue
+  RoundCorner 25
+}
+
+object App
+object Service
+usecase "TaskState" as TaskState <<state>>
+
+App --> Service : run()
+Service --> TaskState : enter()
+@enduml
+
+Now generate the diagram for this summary:
+
+{{PUT-THE-REAL-SUMMARY-JSON-HERE}}

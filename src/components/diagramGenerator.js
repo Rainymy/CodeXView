@@ -1,41 +1,31 @@
 const path = require("node:path");
 const fs = require("node:fs");
 
-const { compareDiagramObjects } = require("./diagramChecker");
-const { extractNodesInfo } = require("../../parsers/utils");
-
-//const OpenAIConnection = require("./OpenAICompletion");
-const AIConnection = require("./AIConnection");
+const AIConnection = require("./OpenAICompletion");
+//const AIConnection = require("./AIConnection");
 const ProjectConfig = require("./ProjectConfig");
 const PlantUML = require("./PlantUML");
 
-/**
-* This function has builtin retries.
-* @typedef {import("../../parsers/utils").SyntaxTreeJSON} SyntaxTreeJSON
-* @param {SyntaxTreeJSON[]} syntaxTree
-* @returns {Promise<string|null>}
-*/
 
-async function validateDiagram(syntaxTree) {
+async function validateDiagram(summaryJson) {
   const MAX_ATTEMPT = 3;
   let attempts = 0;
-
-  const diagramObj = extractNodesInfo(syntaxTree);
 
   while (attempts < MAX_ATTEMPT) {
     attempts++;
   
-    //connection to o1 Model
-    //const diagram = await AIConnection.getChatResponse(allSyntaxTreeJSON);
-    const diagram = await AIConnection.getChatResponse(syntaxTree);
-    // console.log("workspace diagram:", diagram);
+    const diagram = await AIConnection.getChatResponse(summaryJson);
+    console.log("Diagram: ", diagram);
 
     const IsValidDiagramCode = await PlantUML.validatePlantUML(diagram);
-    if (IsValidDiagramCode) {
+    const relationPattern = /(-->|<--|<->|--|==|\.{1,2}>|<\.{1,2})/;
+    const hasRelation = relationPattern.test(diagram);
+
+    if (IsValidDiagramCode && hasRelation) {
       return diagram;
     }
+    
   }
-
   return null;
 }
 

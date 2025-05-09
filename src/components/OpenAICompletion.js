@@ -38,42 +38,32 @@ class OpenAICompletion {
   }
 
   /**
-  * @typedef {import("../../parsers/utils").SyntaxTreeJSON} SyntaxTreeJSON
-  * @param {SyntaxTreeJSON[]} parsedCode
-  * @returns {Promise<String|null>}
-  */
-  async getChatResponse(parsedCode) {
+
+ * Build prompt + call o3 using the slim summary.
+ * @param {object} summary  // the object printed as “Slim JSON”
+ * @returns {Promise<string|null>}
+ */
+  async getChatResponse(summary) {
     const generator = new IDGenerator();
     // const parse = [this.randomJSFile()]; // replace this with `parsedCode`
 
-    const chonk = parsedCode.flatMap(v => depthFirstTree(v, generator));
-    const chunks = this.#chunkify(chonk);
+    const basePrompt = readPrompt();      // file contains {{PUT-THE-REAL-SUMMARY-JSON-HERE}}
+    
+    // 2) inject the summary JSON
+    const prompt = basePrompt.replace(
+      "{{PUT-THE-REAL-SUMMARY-JSON-HERE}}",
+      JSON.stringify(summary, null, 2)
+    );
 
-    const responses = await this.#client.chat.completions.create({
-      messages: [
-        {
-          role: "system",
-          content: readPrompt()
-        },
-        {
-          role: "user",
-          content: readCCDExample()
-        },
-        {
-          role: "user",
-          content: this.readASTPrompt()
-        },
-        ...(chunks.map(this.#toChatParams))
-      ],
-      // number of completion choices to recieve
-      n: 1,
-      temperature: 0.2,
-      model: "gpt-4.1-mini"
-    });
+  // 3) single-message chat call
+  const completion = await this.#client.chat.completions.create({
+    messages: [{ role: "system", content: prompt }],
+    model: "o3",
+    temperature: 0.3,
+    n: 1
+  });
 
-    console.log(responses.choices[0].message.content);
-
-    return responses.choices[0].message.content;
+  return completion.choices[0].message.content;
   }
 
   /**
@@ -111,10 +101,7 @@ class OpenAICompletion {
     return param;
   }
 
-  /**
-  * this is `AST`, pre parsed file (random js file)
-  * @returns {SyntaxTreeJSON}
-  */
+  
   randomJSFile() {
     const filePath = path.join(__dirname, "../prompts/temp.txt");
     const content = fs.readFileSync(filePath, "utf8");

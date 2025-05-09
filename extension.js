@@ -44,8 +44,8 @@ async function startUp() {
   // access keyvault
   KeyVault.init();
 
-  //const [timeAI] = await measureTime(OpenAIConnection.init());
-  const [timeAI] = await measureTime(AIConnection.init());
+  const [timeAI] = await measureTime(OpenAIConnection.init());
+  //const [timeAI] = await measureTime(AIConnection.init());
   timeInfos.push(`[ AI Connection ]: ${timeAI}ms`);
 
   ProjectConfig.load();
