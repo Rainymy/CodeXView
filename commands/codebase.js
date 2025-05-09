@@ -1,3 +1,5 @@
+const { simplifyAST } = require("../parsers/utils");
+
 const {
   getNextFileName,
   validateDiagram
@@ -38,7 +40,44 @@ async function codebaseAnalysis() {
   console.log("Parsed Code:", parsedCode);
 
   const allSyntaxTreeJSON = parsedCode.map((v) => v.json);
-  const validDiagram = await validateDiagram(allSyntaxTreeJSON);
+  
+  const slim = simplifyAST(allSyntaxTreeJSON);
+
+  const drop = name => name !== "Program";
+  slim.classes      = slim.classes.filter(drop);
+  slim.associations = slim.associations.filter(a  => drop(a.owner)   && drop(a.type));
+  slim.messages     = slim.messages.filter   (m  => drop(m.caller)  && drop(m.callee));
+  slim.creations    = slim.creations.filter  (cr => drop(cr.creator) && drop(cr.created));
+
+  const assocSet = new Set();
+  for (const a of slim.associations) {
+    assocSet.add(a.owner);
+    assocSet.add(a.type);
+  }
+
+  const creatSet = new Set();
+  for (const c of slim.creations) {
+    creatSet.add(c.creator);
+    creatSet.add(c.created);
+  }
+
+  const keep = name => assocSet.has(name) && creatSet.has(name);
+
+  slim.classes = slim.classes.filter(keep);
+
+  slim.associations = slim.associations.filter(
+    a => keep(a.owner) && keep(a.type)
+  );
+
+  slim.creations = slim.creations.filter(
+    c => keep(c.creator) && keep(c.created)
+  );
+
+  slim.messages = slim.messages.filter(
+    m => keep(m.caller) && keep(m.callee)
+  );
+  
+  const validDiagram = await validateDiagram(slim);
 
   if (validDiagram === null) {
     Notify.info("CodeXView! Failed to validate Diagram.");

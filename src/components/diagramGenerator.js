@@ -1,41 +1,39 @@
 const path = require("node:path");
 const fs = require("node:fs");
 
-const { compareDiagramObjects } = require("./diagramChecker");
-const { extractNodesInfo } = require("../../parsers/utils");
-
-//const OpenAIConnection = require("./OpenAICompletion");
-const AIConnection = require("./AIConnection");
+const AIConnection = require("./OpenAICompletion");
+//const AIConnection = require("./AIConnection");
 const ProjectConfig = require("./ProjectConfig");
 const PlantUML = require("./PlantUML");
 
-/**
-* This function has builtin retries.
-* @typedef {import("../../parsers/utils").SyntaxTreeJSON} SyntaxTreeJSON
-* @param {SyntaxTreeJSON[]} syntaxTree
-* @returns {Promise<string|null>}
-*/
 
-async function validateDiagram(syntaxTree) {
+async function validateDiagram(summaryJson) {
   const MAX_ATTEMPT = 3;
   let attempts = 0;
 
-  const diagramObj = extractNodesInfo(syntaxTree);
+  let feedback = null;
 
   while (attempts < MAX_ATTEMPT) {
     attempts++;
-  
-    //connection to o1 Model
-    //const diagram = await AIConnection.getChatResponse(allSyntaxTreeJSON);
-    const diagram = await AIConnection.getChatResponse(syntaxTree);
-    // console.log("workspace diagram:", diagram);
 
-    const IsValidDiagramCode = await PlantUML.validatePlantUML(diagram);
-    if (IsValidDiagramCode) {
+    const diagram = await AIConnection.getChatResponse(summaryJson, feedback);
+    console.log(`Attempt ${attempts} - Diagram:\n`, diagram);
+
+    const isValid = await PlantUML.validatePlantUML(diagram);
+    const relationPattern = /(-->|<--|<->|--|==|\.{1,2}>|<\.{1,2})/;
+    const hasRelation = relationPattern.test(diagram);
+
+    if (isValid && hasRelation) {
       return diagram;
     }
-  }
 
+    // Build feedback to improve the next attempt
+    if (!hasRelation) {
+      feedback = "The diagram is missing relationships (arrows) between classes based on the message data. Please include them.";
+    } else if (!isValid) {
+      feedback = "The PlantUML diagram is not valid. Please fix the syntax.";
+    }
+  }
   return null;
 }
 

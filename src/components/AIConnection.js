@@ -39,8 +39,9 @@ class AIConnection {
         },
         body: JSON.stringify({
           systemPrompt: this.#prompt,
-          cccExample: readCCDExample(),
-          diagramCode: parsedCode
+          //cccExample: readCCDExample(),
+          diagramCode: parsedCode,
+          
         })
       });
 
