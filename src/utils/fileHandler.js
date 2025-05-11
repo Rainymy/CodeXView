@@ -75,24 +75,6 @@ function customWriteStream(filePathFs, data) {
   });
 }
 
-
-function writeParser(filePathFs, data) {
-  return new Promise((resolve, reject) => {
-    const stream = fs.createWriteStream(filePathFs, { flags: "w" });
-
-    stream.on("error", reject);
-
-    stream.write(
-      typeof data === "string" ? data : JSON.stringify(data, null, 2),
-      () => {
-        stream.end();
-      }
-    );
-
-    stream.on("finish", () => resolve(null));
-  });
-}
-
 function readCCDExample() {
   const ccd_example_txt = path.join(__dirname, "../prompts/ccd-example.txt");
   return fs.readFileSync(ccd_example_txt, "utf8");
@@ -110,6 +92,5 @@ module.exports = {
   customReadStream: customReadStream,
   customWriteStream: customWriteStream,
   readCCDExample: readCCDExample,
-  readPrompt: readPrompt,
-  writeParser: writeParser
+  readPrompt: readPrompt
 }

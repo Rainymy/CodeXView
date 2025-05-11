@@ -1,5 +1,5 @@
 const fs = require("node:fs");
-const { detectLanguageByPath } = require("./detectLanguage");
+const { detectLanguage, DETECTION_ERROR } = require("linguist-sense");
 
 const {
   getParser,
@@ -11,23 +11,28 @@ const {
 * @param {String} filePath
 * @returns
 */
-function analyzeCode(filePath) {
-  const { language, error, path } = detectLanguageByPath(filePath);
+async function analyzeCode(filePath) {
+  const lang = await detectLanguage(filePath);
 
-  if (error) {
-    console.log("❌ Found No Programming Languages!");
+  if (lang instanceof Error) {
+    if (lang.message === DETECTION_ERROR.UNKNOWN_LANGUAGE) {
+      console.log("❌ Found No Programming Languages!");
+    }
+    else {
+      console.log(lang);
+    }
     return;
   }
 
-  if (!doesLanguageParserExist(language)) {
-    console.warn(`⚠️  No parser available for language: ${language}`);
+  if (!doesLanguageParserExist(lang.name)) {
+    console.warn(`⚠️  No parser available for language: ${lang.name}`);
     return;
   }
 
   const parser = getParser();
-  parser.setLanguage(getLanguageParser(language));
+  parser.setLanguage(getLanguageParser(lang.name));
 
-  return parser.parse(fs.readFileSync(path, "utf8"));
+  return parser.parse(fs.readFileSync(filePath, "utf8"));
 }
 
 module.exports = {

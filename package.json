@@ -95,7 +95,7 @@
     "@azure/keyvault-secrets": "^4.9.0",
     "fast-glob": "^3.3.3",
     "ignore": "^7.0.3",
-    "oniguruma-to-es": "^4.1.0",
+    "linguist-sense": "^2.4.0",
     "openai": "^4.95.0",
     "path-right-join": "^2.0.1",
     "picocolors": "^1.1.1",
