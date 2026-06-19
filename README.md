@@ -1,23 +1,22 @@
-# 📊 CodeXView
+# CodeXView
 
 **CodeXView** is a VS Code extension and visualization tool to automatically generate dynamic code interactions from **source code** / **codebase**.
 
 ---
 
-## 🚀 Features
+## Features
 
-- 📈 Visualizes code relationships and interactions dynamically.
-- 🌍 Multi-language support (currently limited).
-- 🧠 LLM-powered diagram analysis.
+- Visualizes code relationships and interactions dynamically.
+- Multi-language support (currently limited).
+- LLM-powered diagram analysis.
 
 ---
 
-## 📦 Requirements
+## Requirements
 
 - **Node.js**: (v20+)
 - **VS Code**: (1.98+)
-- 🌍 Internet access (for LLM integration)
-- 🧠 Optional: Local LLM setup (e.g., LLaMA or HuggingFace for offline use)
+- Internet access (for LLM integration)
 
 ---
 
@@ -48,7 +47,7 @@ This extension contributes the following settings to VS Code:
 
 ---
 
-## 📃 License
+## License
 
 ### 📒 Project Code:
 License is pending (all rights reserved). See the [LICENSE](./LICENSE).
